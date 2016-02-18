@@ -1,4 +1,4 @@
-package com.deppon.madp.scanlibrary;
+package com.yanling.android.scanlibrary;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.deppon.madp.scanlibrary">
+    package="com.yanling.android.scanlibrary">
 
     <!-- 调用相机权限 -->
     <uses-permission android:name="android.permission.CAMERA" />
@@ -13,7 +13,7 @@
         android:allowBackup="true"
         android:label="@string/app_name">
         <activity
-            android:name="com.deppon.madp.scanlibrary.ScanCameraActivity"
+            android:name="com.yanling.android.scanlibrary.ScanCameraActivity"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar"></activity>
     </application>

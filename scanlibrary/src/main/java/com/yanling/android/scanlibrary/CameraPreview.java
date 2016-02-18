@@ -1,4 +1,4 @@
-package com.deppon.madp.scanlibrary;
+package com.yanling.android.scanlibrary;
 
 import android.content.Context;
 import android.hardware.Camera;
