@@ -15,7 +15,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 
-
+import java.io.Serializable;
 
 
 public class ScanCameraActivity extends Activity {
@@ -97,17 +97,27 @@ public class ScanCameraActivity extends Activity {
             while (isDecode){
                 //判断数据是否为空
                 if (data != null && width >0 && height >0){
+                    /**
+                     *Zxing解析条码信息
+                     */
+                    //现将获取的信息进行90翻转
+                    onTurn(data,width, height);
+                    //解析数据
+                    String result = ScanUtils.decodeZxing(data, width, height);
+
+                    /**
+                     * Zbar解析条码信息
+                     */
                     //获取扫描框矩形
-                    Rect scanRect = finderView.getScanImageRect(width, height);
+                    /*Rect scanRect = finderView.getScanImageRect(width, height);
                     //解析扫描的信息
-                    String result = ScanUtils.decode(data, width, height, scanRect);
+                    String result = ScanUtils.decodeZbar(data, width, height, scanRect);*/
                     //判断是否解析成功
                     if (null != result){
-                        //封装解析参数
+                        //返回消息
                         Message msg = new Message();
                         msg.what = SCAN_OK;
                         msg.obj = result;
-                        //发送回调消息
                         handler.sendMessage(msg);
                         //结束循环
                         break;

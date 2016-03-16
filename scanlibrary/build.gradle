@@ -1,8 +1,16 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
+
+
+repositories {
+    maven {
+        url "https://raw.githubusercontent.com/yan1234/maven-repo/master/repository"
+    }
+    jcenter()
+}
+
+
 dependencies {
-    compile 'com.google.android:android:4.4.2'
-    compile 'com.google.android:support-v4:r7'
     compile 'net.sourceforge.zbar:zbar:1.0'
     compile 'com.google.zxing:core:3.0.0'
 }
@@ -42,14 +50,14 @@ android {
     }
 }
 ext{
-    PUBLISH_GROUP_ID = 'com.deppon.madp'
+    PUBLISH_GROUP_ID = 'com.yanling.android'
     PUBLISH_ARTIFACT_ID = 'scanlibrary'
     PUBLISH_VERSION = android.defaultConfig.versionName
 }
 
 uploadArchives {
     repositories.mavenDeployer {
-        def deployPath = file(getProperty('aar.deployPath'))
+        def deployPath = file("Repository_Path")
         repository(url: "file://${deployPath.absolutePath}")
         pom.project {
             groupId project.PUBLISH_GROUP_ID
