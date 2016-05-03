@@ -1,0 +1,15 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+
+repositories {
+    maven {
+        url "https://raw.githubusercontent.com/yan1234/maven-repo/master/repository"
+    }
+    mavenLocal()
+    jcenter()
+}
+
+dependencies {
+    compile 'com.google.android:android:4.4.2'
+}
