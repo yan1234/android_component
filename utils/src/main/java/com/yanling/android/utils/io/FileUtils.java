@@ -1,7 +1,10 @@
 package com.yanling.android.utils.io;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 
 /**
@@ -95,37 +98,112 @@ public class FileUtils {
         return deleteFileSafety(new File(filePath));
     }
 
+
     /**
-     * 拷贝文件
-     * @param sourcefile
-     * @param targetFile
-     * @oaram isOverride
+     * 拷贝文件/空目录（没有嵌套）到指定的目录下面
+     * @param sourceFile，源文件对象
+     * @param targetDir，拷贝到的指定目录文件对象
+     * @param isOverride，是否覆盖指定目录对象true：覆盖，false：不覆盖
+     * @return，true:拷贝成功，false:拷贝失败
+     * @throws FileNotFoundException
+     * @throws FileAlreadyExistsException
      */
-    public static boolean copyFile(File sourcefile,  File targetFile, boolean isOverride)
+    public static boolean copyToDir(File sourceFile,  File targetDir, boolean isOverride)
             throws FileNotFoundException, FileAlreadyExistsException{
-        //判断源文件是否存在
-        if (!sourcefile.exists()){
+        //判断源文件和目标文件是否存在或则目标文件是否是目录
+        /**
+         * 这里有3种情况直接返回
+         * 1、待拷贝的源文件不存在
+         * 2、拷贝到的目标文件不存在
+         * 3、拷贝到的目标文件不是目录
+         */
+        if (!sourceFile.exists() || !targetDir.exists() || targetDir.isFile()){
             throw new FileNotFoundException();
         }
-        //判断目标文件是否存在，并且是否覆盖
-        if (!isOverride && targetFile.exists()){
-            //当选择不覆盖，并且目标文件对象存在
-            throw new FileAlreadyExistsException("目标文件对象已经存在");
-        }
+        //先得到目标文件对象
+        File targetFile = new File(targetDir.getPath() + File.separator + sourceFile.getName());
+        //如果不指定覆盖
         /**
-         * 根据待拷贝的源文件是目录还是文件进行区分处理
+         * 这里加入一个文件和目录的区分，有可能文件没有后缀名和目录重名导致混淆
+         * 所以判断下待拷贝的源文件对象和目标文件对象是否同为文件/目录
          */
-        if (sourcefile.isDirectory()){
-            //如果拷贝到的目标文件是文件对象的话退出
-            if (targetFile.isFile()){
-                throw new FileNotFoundException("目录不能拷贝到文件中");
-            }else{
-                //如果是目录的话
-
-            }
+        if (!isOverride && targetFile.exists() && (sourceFile.isFile() == targetFile.isFile())){
+            throw new FileAlreadyExistsException("目标目录已经存在该文件对象");
         }
-        //判断
+        //根据待拷贝的源文件是目录还是文件进行区分
+        if (sourceFile.isFile()){
+            //待拷贝的是文件
+            //通过输入输出流进行文件拷贝
+            //得到文件输入输出流对象
+            FileInputStream fis = new FileInputStream(sourceFile);
+            FileOutputStream fos = new FileOutputStream(targetFile);
+            try {
+                //写入文件
+                IO.inputToOutput(fis, fos);
+            } catch (IOException e) {
+                e.printStackTrace();
+                try{
+                    //出现异常，关闭输入输出流
+                    fis.close();
+                    fos.close();
+                }catch (IOException e1){
+                    e1.printStackTrace();
+                }
+                //返回失败
+                return false;
+            }
+        }else{
+            //待拷贝的是目录
+            //直接创建目录
+            targetFile.mkdirs();
+        }
         return true;
+    }
+
+
+    /**
+     * 拷贝文件/空目录（没有嵌套）到指定的目录下面
+     * @param sourceFile，源文件对象
+     * @param targetDirPath，拷贝到的指定目录文件对象
+     * @param isOverride，是否覆盖指定目录对象true：覆盖，false：不覆盖
+     * @return，true:拷贝成功，false:拷贝失败
+     * @throws FileNotFoundException
+     * @throws FileAlreadyExistsException
+     */
+    public static boolean copyToDir(File sourceFile, String targetDirPath, boolean isOverride)
+        throws FileNotFoundException, FileAlreadyExistsException{
+        //根据路径转换为文件对象
+        return copyToDir(sourceFile, new File(targetDirPath), isOverride);
+    }
+
+    /**
+     * 拷贝文件/空目录（没有嵌套）到指定的目录下面
+     * @param sourceFilePath，源文件对象
+     * @param targetDir，拷贝到的指定目录文件对象
+     * @param isOverride，是否覆盖指定目录对象true：覆盖，false：不覆盖
+     * @return，true:拷贝成功，false:拷贝失败
+     * @throws FileNotFoundException
+     * @throws FileAlreadyExistsException
+     */
+    public static boolean copyToDir(String sourceFilePath, File targetDir, boolean isOverride)
+        throws FileNotFoundException, FileAlreadyExistsException{
+        //根据路径转化为文件对象
+        return copyToDir(new File(sourceFilePath), targetDir, isOverride);
+    }
+
+    /**
+     * 拷贝文件/空目录（没有嵌套）到指定的目录下面
+     * @param sourceFilePath，源文件对象
+     * @param targetDirPath，拷贝到的指定目录文件对象
+     * @param isOverride，是否覆盖指定目录对象true：覆盖，false：不覆盖
+     * @return，true:拷贝成功，false:拷贝失败
+     * @throws FileNotFoundException
+     * @throws FileAlreadyExistsException
+     */
+    public static boolean copyToDir(String sourceFilePath, String targetDirPath, boolean isOverride)
+        throws FileNotFoundException, FileAlreadyExistsException{
+        //根据路径转化为文件对象
+        return copyToDir(new File(sourceFilePath), new File(targetDirPath), isOverride);
     }
 
 }
