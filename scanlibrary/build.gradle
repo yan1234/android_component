@@ -57,7 +57,7 @@ ext{
 
 uploadArchives {
     repositories.mavenDeployer {
-        def deployPath = file("Repository_Path")
+        def deployPath = file("F:\\\\Temp")
         repository(url: "file://${deployPath.absolutePath}")
         pom.project {
             groupId project.PUBLISH_GROUP_ID

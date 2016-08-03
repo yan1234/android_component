@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:orientation="horizontal">
+
+    <!-- 最左边的Icon图标 -->
+    <ImageView
+        android:id="@+id/notification_icon"
+        android:layout_width="0dp"
+        android:layout_weight="1.5"
+        android:layout_height="match_parent"
+        android:src="@drawable/download_default_icon"
+        android:padding="5dp"/>
+
+    <!-- 中间的详细信息 -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="5"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:orientation="vertical">
+
+        <!-- 最上面的标题信息 -->
+        <TextView
+            android:id="@+id/notification_titile"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            style="@style/notification_progress_view_item_textStyle"
+            android:singleLine="true"
+            android:ellipsize="middle"
+            android:textSize="15sp"
+            android:text="标题"/>
+
+        <!-- 中间的进度条 -->
+        <ProgressBar
+            android:id="@+id/notification_progress"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            style="@style/notification_progress_view_item_progress"/>
+
+        <!-- 底部的速度和大小 -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <!-- 已下载大小 -->
+            <TextView
+                android:id="@+id/notification_size"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                style="@style/notification_progress_view_item_textStyle"
+                android:text="2.3"/>
+
+            <!-- 分割符 -->
+            <TextView
+                android:id="@+id/notification_split"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@+id/notification_size"
+                style="@style/notification_progress_view_item_textStyle"
+                android:text="/"/>
+
+            <!-- 总大小 -->
+            <TextView
+                android:id="@+id/notification_total"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@+id/notification_split"
+                style="@style/notification_progress_view_item_textStyle"
+                android:text="9.3M"/>
+
+            <!-- 下载速度 -->
+            <TextView
+                android:id="@+id/notification_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                style="@style/notification_progress_view_item_textStyle"
+                android:text="350k/s"/>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+
+    <!-- 右边的暂停/开启按钮 -->
+    <ImageView
+        android:id="@+id/notification_operate"
+        android:layout_width="0dp"
+        android:layout_weight="1.5"
+        android:layout_height="match_parent"
+        android:padding="12dp"
+        android:src="@drawable/download_pause"/>
+
+</LinearLayout>
