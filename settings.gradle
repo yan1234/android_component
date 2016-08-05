@@ -1,1 +1,1 @@
-include ':app', ':scanlibrary', ':testjava', ':utils', ':progressview'
+include ':app', ':scanlibrary', ':testjava', ':utils', ':progressview', ':imageshow'
