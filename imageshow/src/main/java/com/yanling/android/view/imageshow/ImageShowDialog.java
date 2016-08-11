@@ -62,9 +62,9 @@ public class ImageShowDialog extends Dialog implements View.OnClickListener{
     @Override
     public void onClick(View view) {
 
-        //点击ImageView时关闭弹框
+        /*//点击ImageView时关闭弹框
         if (view.getId() == R.id.image_show_image){
             this.dismiss();
-        }
+        }*/
     }
 }
