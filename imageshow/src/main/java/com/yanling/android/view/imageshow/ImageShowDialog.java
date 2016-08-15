@@ -3,6 +3,7 @@ package com.yanling.android.view.imageshow;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -26,11 +27,14 @@ public class ImageShowDialog extends Dialog implements View.OnClickListener{
     //定义变量保存整个根布局
     private View view;
     //定义ImageView对象
-    private ImageView imageView;
+    private PhotoView imageView;
+    //定义photoview事件监听
+    private PhotoViewListener mPhotoViewListener;
 
-    public ImageShowDialog(Context context) {
+    public ImageShowDialog(Context context, PhotoViewListener photoViewListener) {
         super(context);
         this.mContext = context;
+        this.mPhotoViewListener = photoViewListener;
     }
 
 
@@ -52,8 +56,9 @@ public class ImageShowDialog extends Dialog implements View.OnClickListener{
         view = inflater.inflate(R.layout.image_show_dialog, null);
         //添加动画
         view.setAnimation(AnimationUtils.loadAnimation(mContext, R.anim.dialog_bottom_to_top_default));
-        imageView = (ImageView)view.findViewById(R.id.image_show_image);
+        imageView = (PhotoView)view.findViewById(R.id.image_show_image);
         imageView.setOnClickListener(this);
+        imageView.setOnPhotoViewListener(mPhotoViewListener);
         setContentView(view);
         // 这句话起全屏的作用
         getWindow().setLayout(WindowManager.LayoutParams.FILL_PARENT,WindowManager.LayoutParams.FILL_PARENT);
@@ -66,5 +71,9 @@ public class ImageShowDialog extends Dialog implements View.OnClickListener{
         if (view.getId() == R.id.image_show_image){
             this.dismiss();
         }*/
+    }
+
+    public PhotoView getImageView() {
+        return imageView;
     }
 }

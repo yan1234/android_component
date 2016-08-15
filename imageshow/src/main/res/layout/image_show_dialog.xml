@@ -4,10 +4,10 @@
     android:layout_height="fill_parent"
     android:background="#696969">
 
-    <ImageView
+    <com.yanling.android.view.imageshow.PhotoView
         android:id="@+id/image_show_image"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:src="@drawable/test"/>
+        android:scaleType="fitXY"/>
 
 </LinearLayout>
