@@ -31,6 +31,11 @@ public class ImageShowDialog extends Dialog implements View.OnClickListener{
     //定义photoview事件监听
     private PhotoViewListener mPhotoViewListener;
 
+    public ImageShowDialog(Context context){
+        super(context);
+        this.mContext = context;
+    }
+
     public ImageShowDialog(Context context, PhotoViewListener photoViewListener) {
         super(context);
         this.mContext = context;
@@ -75,5 +80,11 @@ public class ImageShowDialog extends Dialog implements View.OnClickListener{
 
     public PhotoView getImageView() {
         return imageView;
+    }
+
+    public void setPhotoViewListener(PhotoViewListener mPhotoViewListener) {
+        this.mPhotoViewListener = mPhotoViewListener;
+        //设置时间监听
+        imageView.setOnPhotoViewListener(mPhotoViewListener);
     }
 }

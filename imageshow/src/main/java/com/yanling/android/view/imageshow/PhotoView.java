@@ -61,8 +61,6 @@ public class PhotoView extends ImageView implements ViewTreeObserver.OnGlobalLay
     //定义标志保存当前是否处于放大状态
     private boolean isZoomUp = false;
 
-    //定义图片的宽高
-    private float mImageWidth, mImageHeight;
 
     public PhotoView(Context context) {
         super(context);
@@ -134,42 +132,49 @@ public class PhotoView extends ImageView implements ViewTreeObserver.OnGlobalLay
     public void onGlobalLayout() {
         //首次载入时，缩放图片的宽高到屏幕的宽高进行适配
         if (isFirst){
-            //获取图片元素
-            Drawable drawable = getDrawable();
-            if (drawable == null){
-                return ;
-            }
-            //获取宽高
-            int width = getWidth();
-            int height = getHeight();
-            //得到图片的宽高
-            int dw = drawable.getIntrinsicWidth();
-            int dh = drawable.getIntrinsicHeight();
-            float scale = 1.0f;
-            //如果图片的宽或高大于屏幕的，则缩放至屏幕的宽或高
-            //主要处理一下3种情况
-            if (dw > width && dh <= height){
-                //1、宽度超出范围，但高度未超出，以宽为刻度缩放
-                scale = width * 1.0f / dw;
-            }
-            if (dh > height && dw < width){
-                //2、高度超出范围，宽未超出，以高为刻度缩放
-                scale = height * 1.0f / dh;
-            }
-            if (dw > width && dh > height){
-                //3、宽高都超出，则以最小的比例基准刻度缩放，保证能显示整张图片
-                scale = Math.min(width * 1.0f / dw, height * 1.0f / dh);
-            }
-            //初始化刻度尺寸
-            initScale = scale;
-            //将图片移至屏幕中心
-            mScaleMatrix.postTranslate((width-dw)*1.0f / 2, (height-dh)*1.0f / 2);
-            //以屏幕中心为缩放点缩放到初始比例
-            mScaleMatrix.postScale(scale, scale, getWidth()/2, getHeight()/2);
-            setImageMatrix(mScaleMatrix);
+            initImageLayout();
             //初始化后重置标志
             isFirst = false;
         }
+    }
+
+    /**
+     * 初始化图片显示
+     */
+    private void initImageLayout(){
+        //获取图片元素
+        Drawable drawable = getDrawable();
+        if (drawable == null){
+            return ;
+        }
+        //获取宽高
+        int width = getWidth();
+        int height = getHeight();
+        //得到图片的宽高
+        int dw = drawable.getIntrinsicWidth();
+        int dh = drawable.getIntrinsicHeight();
+        float scale = 1.0f;
+        //如果图片的宽或高大于屏幕的，则缩放至屏幕的宽或高
+        //主要处理一下3种情况
+        if (dw > width && dh <= height){
+            //1、宽度超出范围，但高度未超出，以宽为刻度缩放
+            scale = width * 1.0f / dw;
+        }
+        if (dh > height && dw < width){
+            //2、高度超出范围，宽未超出，以高为刻度缩放
+            scale = height * 1.0f / dh;
+        }
+        if (dw > width && dh > height){
+            //3、宽高都超出，则以最小的比例基准刻度缩放，保证能显示整张图片
+            scale = Math.min(width * 1.0f / dw, height * 1.0f / dh);
+        }
+        //初始化刻度尺寸
+        initScale = scale;
+        //将图片移至屏幕中心
+        mScaleMatrix.postTranslate((width-dw)*1.0f / 2, (height-dh)*1.0f / 2);
+        //以屏幕中心为缩放点缩放到初始比例
+        mScaleMatrix.postScale(scale, scale, getWidth()/2, getHeight()/2);
+        setImageMatrix(mScaleMatrix);
     }
 
     /*@Override
@@ -282,13 +287,45 @@ public class PhotoView extends ImageView implements ViewTreeObserver.OnGlobalLay
                     }
                 }
             }
+            //如果当前处于放大状态，则滑动时处理图片移动事件
+            if (isZoomUp){
+                //计算滑动的X、Y方向上的偏移
+                float offsetX = motionEvent1.getX() - motionEvent.getX();
+                float offsetY = motionEvent1.getY() - motionEvent.getY();
+                mScaleMatrix.postTranslate(offsetX, offsetY);
+                //控制下滑动的边界布局
+                checkBorderAndCenterWhenScale();
+                setImageMatrix(mScaleMatrix);
+
+            }
             return true;
         }
 
         @Override
         public boolean onDoubleTap(MotionEvent e) {
             Log.d(TAG, "OnGestureListener：onDoubleTap");
-
+            //如果当前状态是处于缩放状态，则双击进行还原
+            if (isZoomUp){
+                //初始化图片显示
+                //将图片移至屏幕中心
+                mScaleMatrix.postTranslate((getWidth()-getDrawable().getIntrinsicWidth())*1.0f / 2,
+                        (getHeight()-getDrawable().getIntrinsicHeight())*1.0f / 2);
+                //以屏幕中心为缩放点缩放到初始比例
+                mScaleMatrix.postScale(initScale/getScale(), initScale/getScale(), getWidth()/2, getHeight()/2);
+                //处理边界偏移
+                checkBorderAndCenterWhenScale();
+                setImageMatrix(mScaleMatrix);
+                isZoomUp = false;
+            }//双击对图片放大
+            else{
+                //进行缩放
+                mScaleMatrix.postScale(2.0f, 2.0f,
+                        e.getX(), e.getY());
+                //处理边界偏移
+                checkBorderAndCenterWhenScale();
+                setImageMatrix(mScaleMatrix);
+                isZoomUp = true;
+            }
             return super.onDoubleTap(e);
         }
     };
@@ -323,6 +360,13 @@ public class PhotoView extends ImageView implements ViewTreeObserver.OnGlobalLay
                 //处理边界偏移
                 checkBorderAndCenterWhenScale();
                 setImageMatrix(mScaleMatrix);
+                //设定缩放标志
+                if (getScale() != initScale){
+                    isZoomUp = true;
+                }else{
+                    isZoomUp = false;
+                }
+
             }
             return true;
         }
@@ -378,12 +422,13 @@ public class PhotoView extends ImageView implements ViewTreeObserver.OnGlobalLay
         mScaleMatrix.postTranslate(deltaX, deltaY);
     }
 
+
     /**
      * 根据图片当前的matrix获取图片的范围
      * @return
      */
     private RectF getMatrixRectF(){
-        Matrix matrix = new Matrix();
+        Matrix matrix = mScaleMatrix;
         RectF rectF = new RectF();
         if (getDrawable() != null){
             rectF.set(0, 0, getDrawable().getIntrinsicWidth(), getDrawable().getIntrinsicHeight());
@@ -392,5 +437,11 @@ public class PhotoView extends ImageView implements ViewTreeObserver.OnGlobalLay
         return rectF;
     }
 
+    public boolean isEnable() {
+        return isEnable;
+    }
 
+    public void setIsEnable(boolean isEnable) {
+        this.isEnable = isEnable;
+    }
 }
