@@ -1,0 +1,44 @@
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <script type="text/javascript">
+
+        var WVIFrame = document.createElement("iframe");
+        WVIFrame.style.display = "none";
+        document.documentElement.appendChild(WVIFrame);
+
+        window.onload = function(){
+
+        }
+
+        function haha(){
+            //window.extendJSApi.callNativeApi("test", "this is a test", "test");
+            var json = {};
+            json["methodName"] = "test";
+            var data = {};
+            data["data"] = "this is a test";
+            data["callback"] = "test";
+            json["data"] = data;
+            WVIFrame.src = "xx://native?"+encodeURI(JSON.stringify(json));
+        }
+
+        function test(msg){
+            alert(msg);
+            var tmp = JSON.parse(msg);
+            alert(tmp.callbackId)
+            //return "this is js";
+            //给native端返回数据
+            var json = {};
+            json["data"] = "this is js";
+            json["callbackId"] = tmp["callbackId"];
+            WVIFrame.src = "yy://js?"+encodeURI(JSON.stringify(json));
+        }
+
+    </script>
+</head>
+
+<body>
+    <h1>这是一个web页面</h1>
+    <button onclick="haha();">点击</button>
+</body>
+</html>
