@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--　bottom_menu　背景色　-->
+    <color name="bottom_menu_bg_common">#FFFFFF</color>
+    <!-- bottom_menu 被按下后的背景色　-->
+    <color name="bottom_menu_bg_pressed">#EEEEEE</color>
+    <!--　bottom_menu_item_textColor -->
+    <color name="bottom_menu_item_textColor">#5B729A</color>
+    <!-- bottom_menu_item 被按下后的textColor -->
+    <color name="bottom_menu_item_textColor_pressed">#3F51B5</color>
+
+
+</resources>
