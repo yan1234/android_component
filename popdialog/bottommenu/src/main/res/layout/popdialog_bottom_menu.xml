@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <ListView
+        android:id="@+id/bottom_menu_lv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bottom_menu_tv_cancel"
+        android:layout_marginLeft="@dimen/bottom_menu_margin"
+        android:layout_marginRight="@dimen/bottom_menu_margin"
+        android:layout_marginBottom="@dimen/bottom_menu_margin"
+        android:divider="#5B729A"
+        android:dividerHeight="1dp"/>
+
+    <TextView
+        android:id="@+id/bottom_menu_tv_cancel"
+        android:layout_width="match_parent"
+        style="@style/bottom_menu_item"
+        android:layout_above="@+id/bottom_menu_line"
+        android:layout_marginLeft="@dimen/bottom_menu_margin"
+        android:layout_marginRight="@dimen/bottom_menu_margin"
+        android:layout_marginBottom="5dp"
+        android:text="取消"/>
+
+    <View
+        android:id="@+id/bottom_menu_line"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignParentBottom="true"></View>
+
+</RelativeLayout>
