@@ -1,0 +1,12 @@
+//添加常用的依赖仓库
+repositories {
+    mavenLocal()
+    maven {
+        url "https://raw.githubusercontent.com/yan1234/maven-repo/master/repository"
+    }
+    //阿里镜像库
+    maven {
+        url "http://maven.aliyun.com/nexus/content/groups/public/"
+    }
+    jcenter()
+}

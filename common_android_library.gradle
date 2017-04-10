@@ -1,0 +1,99 @@
+apply plugin: 'com.android.library'
+apply plugin: 'maven'
+
+//添加常用的依赖仓库
+repositories {
+    mavenLocal()
+    maven {
+        url "https://raw.githubusercontent.com/yan1234/maven-repo/master/repository"
+    }
+    //阿里镜像库
+    maven {
+        url "http://maven.aliyun.com/nexus/content/groups/public/"
+    }
+    jcenter()
+}
+
+ext {
+
+}
+
+//添加常用的Android Library依赖配置
+android {
+    compileSdkVersion Integer.parseInt(module_compileSdkVersion)
+    buildToolsVersion module_buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion Integer.parseInt(module_minSdkVersion)
+        targetSdkVersion Integer.parseInt(module_targetSdkVersion)
+        versionCode Integer.parseInt(module_versionCode)
+        versionName module_versionName
+
+        //ADD THIS LINE:
+        //添加支持单元测试
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+    }
+
+    //android工程目录结构配置
+    sourceSets {
+        main {
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+            java.srcDirs = ['src/main/java']
+            resources.srcDirs = ['src/main/java']
+            aidl.srcDirs = ['src/main/java']
+            renderscript.srcDirs = ['src/main/java']
+            res.srcDirs = ['src/main/res']
+            assets.srcDirs = ['src/main/assets']
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+}
+
+//添加单元测试依赖
+dependencies {
+    //单元测试
+    testCompile 'junit:junit:4.12'
+    androidTestCompile 'com.android.support.test:runner:0.4'
+    // Set this dependency to use JUnit 4 rules
+    androidTestCompile 'com.android.support.test:rules:0.4'
+    // Set this dependency to build and run Espresso tests
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+    // Set this dependency to build and run UI Automator tests
+    //androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
+}
+
+//添加maven上传的task
+uploadArchives {
+    repositories.mavenDeployer {
+        def deployPath = file("/opt/repository")
+        repository(url: "file://${deployPath.absolutePath}")
+        pom.project {
+            groupId module_publish_group_id
+            artifactId module_publish_artifact_id
+            version module_publish_version
+        }
+    }
+}
+
+//添加build前导任务
+project.assemble.doFirst {
+    //执行module的配置初始化
+    //initAndroidLibrary()
+}
+
+//添加maven上传的前导任务
+project.uploadArchives.doFirst {
+    println ">>>>>>执行maven上传任务"
+    //执行groupId等配置
+    //initUploadArchives()
+}
