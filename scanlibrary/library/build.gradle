@@ -4,23 +4,3 @@ dependencies {
     compile 'com.google.zxing:core:3.0.0'
     compile 'net.sourceforge.zbar:zbar:1.0'
 }
-
-//设置编译构建的参数
-def init() {
-    //定义android编译的相关配置
-    module_compileSdkVersion = 19
-    module_buildToolsVersion = "19.1.0"
-    module_minSdkVersion = 14
-    module_targetSdkVersion = 19
-    module_versionCode = 1
-    module_versionName = "1.0"
-    //定义Maven构建的相关配置
-    module_publish_group_id = "com.yanling.android"
-    module_publish_artifact_id = "scanlibrary"
-    module_publish_version = "1.0"
-}
-
-//调用
-init()
-
-
