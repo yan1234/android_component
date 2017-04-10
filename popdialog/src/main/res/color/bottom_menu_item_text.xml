@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item
-        android:state_pressed="true"
-        android:color="@color/bottom_menu_item_textColor_pressed"></item>
-    <item android:color="@color/bottom_menu_item_textColor"></item>
-</selector>
