@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:id="@+id/item_imageselect_layout"
+    android:padding="1dp">
+
+    <!--　图片缩略图 -->
+    <ImageView
+        android:id="@+id/item_imageselect_img"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"/>
+
+    <RelativeLayout
+        android:id="@+id/item_imageselect_select_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/bg_transparent_two">
+
+        <!--　勾选框 -->
+        <ImageView
+            android:id="@+id/item_imageselect_select"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/unselected"/>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

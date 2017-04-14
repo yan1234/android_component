@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 上面的title操作栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:background="@color/top_bottom_bg">
+
+        <!--　左边的返回按钮 -->
+        <ImageView
+            android:id="@+id/imageselect_back"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:padding="5dp"
+            android:src="@drawable/back"/>
+
+        <!-- 分割线 -->
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#000000"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"></View>
+
+        <!-- 标题栏 -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:textSize="20sp"
+            android:textColor="@color/tv_textColor_reached"
+            android:text="图片选择"/>
+
+        <!-- 右边的完成选择按钮 -->
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="match_parent"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+
+            <TextView
+                android:id="@+id/imageselect_ok"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:textColor="@color/tv_textColor_unreached"
+                android:text="完成"
+                android:background="@color/tv_bg_unreached"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <!-- 中间的图片缩略图　-->
+    <GridView
+        android:id="@+id/imageselect_grid"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10"
+        android:numColumns="3"
+        android:background="#000000"></GridView>
+
+    <!--　底部的图片目录分类 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/top_bottom_bg"
+        android:orientation="horizontal">
+
+        <!-- 左边的目录选项 -->
+
+        <RelativeLayout
+            android:id="@+id/imageselect_category_layout"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/imageselect_category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:textColor="@color/tv_textcolor"
+                android:textSize="18sp"
+                android:text="图片目录"/>
+
+            <!-- 目录选项边的下拉图标 -->
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_toRightOf="@+id/imageselect_category"
+                android:layout_alignBottom="@+id/imageselect_category"
+                android:layout_marginLeft="5dp"
+                android:src="@drawable/spread"/>
+
+        </RelativeLayout>
+
+
+        <!-- 空白区域 -->
+        <View
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="match_parent"></View>
+
+        <!-- 分割线 -->
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#000000"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"></View>
+
+        <!-- 右边的预览字样 -->
+        <TextView
+            android:id="@+id/imageselect_preview"
+            android:layout_width="0dp"
+            android:layout_weight="1.5"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textColor="@color/tv_textColor_unreached"
+            android:textSize="16sp"
+            android:text="预览"/>
+
+    </LinearLayout>
+
+</LinearLayout>

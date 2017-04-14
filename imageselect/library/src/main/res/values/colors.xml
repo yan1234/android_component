@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--　定义顶部和底部操作栏背景色 -->
+    <color name="top_bottom_bg">#404040</color>
+
+    <!-- 当textview无法被点击操作时的字体颜色 -->
+    <color name="tv_textColor_unreached">#8B8386</color>
+    <!-- 当textview可以被点击操作时的字体颜色 -->
+    <color name="tv_textColor_reached">#FFFFFF</color>
+
+    <!-- 当textview无法被点击操作时的背景颜色 -->
+    <color name="tv_bg_unreached">#006400</color>
+    <!-- 当textview可以被点击操作时的背景颜色 -->
+    <color name="tv_bg_reached">#458B00</color>
+    
+    <!--　定义半透明的背景色 -->
+    <color name="bg_transparent_one">#33000000</color>
+    <color name="bg_transparent_two">#55000000</color>
+    <color name="bg_transparent_three">#99000000</color>
+
+
+</resources>
