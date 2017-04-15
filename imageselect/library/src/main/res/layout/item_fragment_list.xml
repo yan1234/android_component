@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_fragment_list_layout"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!--　左边的缩略图 -->
+    <ImageView
+        android:id="@+id/item_fragment_list_thumbnail"
+        android:layout_width="0dp"
+        android:layout_weight="1.5"
+        android:layout_height="80dp"
+        android:scaleType="centerCrop"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:src="@drawable/selected"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="2"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- 目录名称 -->
+        <TextView
+            android:id="@+id/item_fragment_list_category"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="bottom"
+            android:layout_weight="1"
+            android:textColor="#000000"
+            android:text="所有目录"/>
+
+        <!--　该目录下图片张数 -->
+        <TextView
+            android:id="@+id/item_fragment_list_number"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="100张"/>
+
+    </LinearLayout>
+
+
+    <!--　右边的当前目录标示按钮 -->
+    <ImageView
+        android:id="@+id/item_fragment_list_checked"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="24dp"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/checked"/>
+
+</LinearLayout>

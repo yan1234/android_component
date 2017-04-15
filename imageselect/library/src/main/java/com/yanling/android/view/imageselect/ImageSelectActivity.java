@@ -1,6 +1,7 @@
 package com.yanling.android.view.imageselect;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -12,13 +13,16 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 图片选择界面
@@ -48,8 +52,21 @@ public class ImageSelectActivity extends Activity implements View.OnClickListene
     private ImageView img_back;
     //定义完成按钮
     private TextView tv_ok;
+    //定义目录选择布局
+    private RelativeLayout layout_category;
+    private TextView tv_category;
     //定义预览按钮
     private TextView tv_preview;
+
+    //定义map按照目录分类保存图片列表
+    private List<String> bucketList = new ArrayList<>();
+    private Map<String, List<String>> bucketMap = new HashMap<>();
+    //定义变量保存当前的目录名称
+    private String current_bucketName = "所有目录";
+
+    //定义目录fragment对象
+    private BucketFragment fragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +127,23 @@ public class ImageSelectActivity extends Activity implements View.OnClickListene
         imageGrid.setColumnWidth(params.column_width);
         img_back = (ImageView)this.findViewById(R.id.imageselect_back);
         tv_ok = (TextView)this.findViewById(R.id.imageselect_ok);
+        layout_category = (RelativeLayout)this.findViewById(R.id.imageselect_category_layout);
+        tv_category = (TextView)this.findViewById(R.id.imageselect_category);
         tv_preview = (TextView)this.findViewById(R.id.imageselect_preview);
+
+        //初始化Fragment
+        fragment = new BucketFragment();
+        //设置展示数据
+        bucketMap.put(current_bucketName, images);
+        bucketList.add(0, current_bucketName);
+        fragment.setBucketList(bucketList, bucketMap);
+        fragment.setChecked_bucketName(current_bucketName);
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        //将fragment添加到当前布局
+        transaction.add(R.id.imageselect_fragment, fragment);
+        //隐藏当前fragment
+        transaction.hide(fragment);
+        transaction.commit();
     }
 
     /**
@@ -164,6 +197,24 @@ public class ImageSelectActivity extends Activity implements View.OnClickListene
         img_back.setOnClickListener(this);
         //添加完成按钮点击事件
         tv_ok.setOnClickListener(this);
+        //添加目录点击时间
+        layout_category.setOnClickListener(this);
+        tv_category.setOnClickListener(this);
+    }
+
+    /**
+     * 目录列表点击事件监听
+     * @param bucketName,当前点击的目录名称
+     */
+    public void bucketItemClick(String bucketName){
+        //保存当前的目录名
+        current_bucketName = bucketName;
+        adapter.setImages(bucketMap.get(current_bucketName));
+        adapter.notifyDataSetChanged();
+        //隐藏当前fragment
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.hide(fragment);
+        transaction.commit();
     }
 
     @Override
@@ -178,6 +229,16 @@ public class ImageSelectActivity extends Activity implements View.OnClickListene
             }else{
                 //返回选择的图片数据
             }
+        }else if (v.getId() == R.id.imageselect_category_layout
+                || v.getId() == R.id.imageselect_category){
+            //布局点击操作事件
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            if (fragment.isHidden()){
+                transaction.show(fragment);
+            }else{
+                transaction.hide(fragment);
+            }
+            transaction.commit();
         }
     }
 
@@ -235,19 +296,44 @@ public class ImageSelectActivity extends Activity implements View.OnClickListene
         List<String> images = new ArrayList<>();
         //获取ContentResolver对象
         ContentResolver resolver = mContext.getContentResolver();
+        //定义查询器对象
+        StringBuilder selection = new StringBuilder();
+        //标示查询所有的
+        /*if (bucketName != null){
+            //添加目录匹配
+            selection.append(MediaStore.Images.Media.BUCKET_DISPLAY_NAME
+                    + "=" + bucketName + " and");
+        }*/
+        //添加jpg/png过滤
+        selection.append(MediaStore.Images.Media.MIME_TYPE +" in (?, ?) ")
+                .append("and " + MediaStore.Images.Media.HEIGHT + ">? ") //添加宽高过滤
+                .append("and " + MediaStore.Images.Media.WIDTH + ">? ")
+                .append("and " + MediaStore.Images.Media.SIZE + ">?");   //添加大小控制
+        String[] selectionArgs ={"image/jpeg", "image/png", "100", "100", "10240"};
         Cursor cursor = resolver.query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                null,
-                MediaStore.Images.Media.MIME_TYPE +" in (?, ?) "    //只查询jpg/png
-                + "and " + MediaStore.Images.Media.HEIGHT + ">100 "
-                + "and " + MediaStore.Images.Media.WIDTH + ">100 "  //控制宽高都大于100
-                + "and " + MediaStore.Images.Media.SIZE + ">10240", //控制图片大于10k
-                new String[]{"image/jpeg", "image/png"},
+                new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME, MediaStore.Images.Media.DATA},
+                selection.toString(),
+                selectionArgs,
                 MediaStore.Images.Media.DATE_ADDED + " desc"  //按照添加的先后顺序获取
         );
         while (cursor.moveToNext()){
-            //获取图片的路径
-            images.add(cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA)));
+            //获取图片的目录和路径
+            String bucketName = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME));
+            String url = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            images.add(url);
+            //如果map中已经有该目录下的图片
+            if (bucketMap.containsKey(bucketName)){
+                //将当前的图片添加到该目录下
+                bucketMap.get(bucketName).add(url);
+            }else{
+                //如果还没有添加该目录
+                List<String> list = new ArrayList<>();
+                list.add(url);
+                bucketMap.put(bucketName, list);
+                //记录目录列表
+                bucketList.add(bucketName);
+            }
         }
         if (cursor != null){
             cursor.close();

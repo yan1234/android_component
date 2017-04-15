@@ -65,14 +65,27 @@
 
     </LinearLayout>
 
-    <!-- 中间的图片缩略图　-->
-    <GridView
-        android:id="@+id/imageselect_grid"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
         android:layout_weight="10"
-        android:numColumns="3"
-        android:background="#000000"></GridView>
+        android:layout_height="0dp">
+
+        <!-- 中间的图片缩略图　-->
+        <GridView
+            android:id="@+id/imageselect_grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#000000"></GridView>
+
+        <!--　预留一块布局用于承接目录展示的Fragment　-->
+        <FrameLayout
+            android:id="@+id/imageselect_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"></FrameLayout>
+
+    </RelativeLayout>
+
 
     <!--　底部的图片目录分类 -->
     <LinearLayout
@@ -98,7 +111,7 @@
                 android:gravity="center"
                 android:textColor="@color/tv_textcolor"
                 android:textSize="18sp"
-                android:text="图片目录"/>
+                android:text="所有目录"/>
 
             <!-- 目录选项边的下拉图标 -->
             <ImageView

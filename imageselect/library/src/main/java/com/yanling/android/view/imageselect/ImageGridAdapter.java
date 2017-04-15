@@ -87,7 +87,7 @@ public class ImageGridAdapter extends BaseAdapter{
             viewHolder.img.setTag(R.id.image_tag, images.get(position));
         }
         //设定默认的图片选中情况
-        if (selectImgs.contains(images.get(position))){
+        if (selectImgs != null && selectImgs.contains(images.get(position))){
             //执行选中的情况
             viewHolder.select_layout.setBackgroundColor(mContext.getResources().getColor(R.color.bg_transparent_three));
             viewHolder.select.setImageResource(R.drawable.selected);
@@ -110,6 +110,18 @@ public class ImageGridAdapter extends BaseAdapter{
     @Override
     public long getItemId(int position) {
         return position;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+    public List<String> getSelectImgs() {
+        return selectImgs;
+    }
+
+    public void setSelectImgs(List<String> selectImgs) {
+        this.selectImgs = selectImgs;
     }
 
     class ViewHolder{
