@@ -19,5 +19,7 @@
     <color name="bg_transparent_two">#55000000</color>
     <color name="bg_transparent_three">#99000000</color>
 
+    <!--　定义分割线 -->
+    <color name="divider">#C5C1AA</color>
 
 </resources>

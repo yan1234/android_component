@@ -78,11 +78,11 @@
             android:background="#000000"></GridView>
 
         <!--　预留一块布局用于承接目录展示的Fragment　-->
-        <FrameLayout
+        <RelativeLayout
             android:id="@+id/imageselect_fragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/transparent"></FrameLayout>
+            android:background="@android:color/transparent"></RelativeLayout>
 
     </RelativeLayout>
 

@@ -116,6 +116,10 @@ public class ImageGridAdapter extends BaseAdapter{
         this.images = images;
     }
 
+    public List<String> getImages() {
+        return images;
+    }
+
     public List<String> getSelectImgs() {
         return selectImgs;
     }

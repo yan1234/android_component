@@ -35,8 +35,19 @@ public class ImageSelectTest extends ActivityInstrumentationTestCase2<ImageSelec
 
     @Test
     public void typeOperandsAndPerformAddOperation(){
+        //执行测试操作
+    }
+
+    @Test
+    public void testResolverImages(){
         //执行测试
         List<String> photos = activity.resolverImages();
+        String haha = "";
+    }
+
+    @Test
+    public void testShowPreview(){
+        activity.showPreview();
         String haha = "";
     }
 

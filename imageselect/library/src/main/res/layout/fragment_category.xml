@@ -11,6 +11,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="50dp"
+        android:dividerHeight="1dp"
+        android:divider="@color/divider"
         android:background="#FFFFFF">
     </ListView>
 

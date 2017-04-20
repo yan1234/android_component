@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -40,13 +41,13 @@ public class ImageSelectActivity extends Activity implements View.OnClickListene
     //定义适配器
     private ImageGridAdapter adapter;
     //定义图片数据
-    private List<String> images;
+    private ArrayList<String> images;
 
     //定义自定义参数配置对象
     private Params params;
 
     //定义List保存选中的图片
-    private List<String> selectImgs = new ArrayList<>();
+    private ArrayList<String> selectImgs = new ArrayList<>();
 
     //定义返回按钮
     private ImageView img_back;
@@ -200,6 +201,8 @@ public class ImageSelectActivity extends Activity implements View.OnClickListene
         //添加目录点击时间
         layout_category.setOnClickListener(this);
         tv_category.setOnClickListener(this);
+        //添加预览界面点击事件
+        tv_preview.setOnClickListener(this);
     }
 
     /**
@@ -209,6 +212,8 @@ public class ImageSelectActivity extends Activity implements View.OnClickListene
     public void bucketItemClick(String bucketName){
         //保存当前的目录名
         current_bucketName = bucketName;
+        //改变目录显示名称
+        tv_category.setText(current_bucketName);
         adapter.setImages(bucketMap.get(current_bucketName));
         adapter.notifyDataSetChanged();
         //隐藏当前fragment
@@ -239,7 +244,39 @@ public class ImageSelectActivity extends Activity implements View.OnClickListene
                 transaction.hide(fragment);
             }
             transaction.commit();
+        }else if (v.getId() == R.id.imageselect_preview){
+            //图片预览界面
+            showPreview();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //标示预览界面请求返回
+        if (requestCode == 200){
+            //返回成功
+            if (resultCode == Activity.RESULT_OK){
+                //获取选择的列表
+                selectImgs = (ArrayList<String>) data.getExtras().getSerializable(PreviewActivity.BUNDLE_SELECTED_IMAGES);
+                //@TODO
+            }
+        }
+    }
+
+    /**
+     * 跳转到图片预览界面
+     */
+    public void showPreview(){
+        Intent intent = new Intent(ImageSelectActivity.this, PreviewActivity.class);
+        Bundle bundle = new Bundle();
+        //封装待传递的信息
+        bundle.putSerializable(PreviewActivity.BUNDLE_SHOW_IMAGES, (ArrayList)adapter.getImages());
+        bundle.putSerializable(PreviewActivity.BUNDLE_SELECTED_IMAGES, selectImgs);
+        bundle.putInt(PreviewActivity.BUNDLE_CURRENT_POSITION, 0);
+        bundle.putInt(PreviewActivity.BUNDLE_TOTAL_SELECTED, params.select_total_num);
+        intent.putExtras(bundle);
+        startActivityForResult(intent, 200);
     }
 
     /**
@@ -292,8 +329,8 @@ public class ImageSelectActivity extends Activity implements View.OnClickListene
      * 获取图片数据
      * @return
      */
-    public List<String> resolverImages(){
-        List<String> images = new ArrayList<>();
+    public ArrayList<String> resolverImages(){
+        ArrayList<String> images = new ArrayList<>();
         //获取ContentResolver对象
         ContentResolver resolver = mContext.getContentResolver();
         //定义查询器对象

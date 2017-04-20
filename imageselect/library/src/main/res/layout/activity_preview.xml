@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#000000">
+
+    <!-- 上面的title操作栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:background="@color/top_bottom_bg">
+
+        <!--　左边的返回按钮 -->
+        <ImageView
+            android:id="@+id/activity_preview_back"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:padding="5dp"
+            android:src="@drawable/back"/>
+
+        <!-- 分割线 -->
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#000000"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"></View>
+
+        <!-- 当前图片的数量 -->
+        <TextView
+            android:id="@+id/activity_preview_number"
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:textSize="20sp"
+            android:textColor="@color/tv_textColor_reached"
+            android:text="1/100"/>
+
+        <!-- 右边的完成选择按钮 -->
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="match_parent"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+
+            <TextView
+                android:id="@+id/activity_preview_ok"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:textColor="@color/tv_textColor_unreached"
+                android:text="完成"
+                android:background="@color/tv_bg_unreached"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="11">
+
+        <!-- 图片展示 -->
+        <ImageView
+            android:id="@+id/activity_preview_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="center"
+            android:layout_weight="12"/>
+
+        <!--　勾选框 -->
+        <ImageView
+            android:id="@+id/activity_preview_select"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/unselected"/>
+
+    </RelativeLayout>
+
+
+</LinearLayout>

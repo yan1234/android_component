@@ -9,7 +9,8 @@
 
         <!-- 定义图片选择界面 -->
         <activity android:name=".ImageSelectActivity"></activity>
-
+        <!-- 定义图片预览界面 -->
+        <activity android:name=".PreviewActivity"></activity>
     </application>
 
 </manifest>
