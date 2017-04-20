@@ -34,8 +34,8 @@ public class ImageGridAdapter extends BaseAdapter{
     //定义等宽等高的布局设置
     private AbsListView.LayoutParams params;
 
-    //定义item缓存map对象
-    private Map<Integer, View> viewCacheMap = new HashMap<>();
+    //定义item缓存map对象,String为每一个item待展示的图片地址
+    private Map<String, View> viewCacheMap = new HashMap<>();
 
     //定义变量标志当前是否滑动(默认false页面加载时自动加载)
     private boolean isScroll = false;
@@ -57,7 +57,7 @@ public class ImageGridAdapter extends BaseAdapter{
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder = null;
         //是否缓存了该item
-        if (!viewCacheMap.containsKey(position) || viewCacheMap.get(position) == null){
+        if (!viewCacheMap.containsKey(images.get(position)) || viewCacheMap.get(images.get(position)) == null){
             //没有缓存,加载
             viewHolder = new ViewHolder();
             //载入布局
@@ -69,13 +69,15 @@ public class ImageGridAdapter extends BaseAdapter{
             viewHolder.select = (ImageView)convertView.findViewById(R.id.item_imageselect_select);
             //将item项缓存起来
             convertView.setTag(viewHolder);
-            viewCacheMap.put(position, convertView);
+            viewCacheMap.put(images.get(position), convertView);
+            //注意要在这里设置,不然会造成第一个item失效
+            //控制每一个item的大小(等宽等高显示)
+            viewHolder.layout.setLayoutParams(params);
         }else{
-            convertView = viewCacheMap.get(position);
+            convertView = viewCacheMap.get(images.get(position));
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        //控制每一个item的大小(等宽等高显示)
-        viewHolder.layout.setLayoutParams(params);
+
         //当没有滑动时加载图片
         if (!isScroll){
             //显示图片(通过Glide加载图片)
@@ -91,6 +93,10 @@ public class ImageGridAdapter extends BaseAdapter{
             //执行选中的情况
             viewHolder.select_layout.setBackgroundColor(mContext.getResources().getColor(R.color.bg_transparent_three));
             viewHolder.select.setImageResource(R.drawable.selected);
+        }else{
+            //载入未被选中的情况
+            viewHolder.select_layout.setBackgroundColor(mContext.getResources().getColor(R.color.bg_transparent_two));
+            viewHolder.select.setImageResource(R.drawable.unselected);
         }
 
         return convertView;

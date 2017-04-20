@@ -162,36 +162,37 @@ public class ImageSelectActivity extends Activity implements View.OnClickListene
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ImageGridAdapter.ViewHolder viewHolder = (ImageGridAdapter.ViewHolder) view.getTag();
                 //判断当前图片是否选中
-                if (selectImgs.contains(images.get(position))){
+                if (selectImgs.contains(adapter.getImages().get(position))){
                     //表示当前item被选中,点击后取消选中
                     //调整当前背景
                     viewHolder.select_layout.setBackgroundColor(getResources().getColor(R.color.bg_transparent_two));
                     //取消选项框
                     viewHolder.select.setImageResource(R.drawable.unselected);
                     //去除该项
-                    selectImgs.remove(images.get(position));
+                    selectImgs.remove(adapter.getImages().get(position));
                 }else if (selectImgs.size() <= params.select_total_num-1){
                     //选中该项
                     viewHolder.select_layout.setBackgroundColor(getResources().getColor(R.color.bg_transparent_three));
                     viewHolder.select.setImageResource(R.drawable.selected);
-                    selectImgs.add(images.get(position));
+                    selectImgs.add(adapter.getImages().get(position));
                 }else{
                     Toast.makeText(mContext, "已超出最大选择张数", Toast.LENGTH_SHORT).show();
                 }
-                //判断当前是否有选中的列表
-                if (selectImgs.size() > 0){
-                    //如果有选中的,则改变预览和完成按钮的状态
-                    tv_ok.setBackgroundColor(getResources().getColor(R.color.tv_bg_reached));
-                    tv_ok.setTextColor(getResources().getColor(R.color.tv_textColor_reached));
-                    tv_ok.setText("完成(" + selectImgs.size() + "/" + params.select_total_num + ")");
-                    tv_preview.setTextColor(getResources().getColor(R.color.tv_textColor_reached));
-                }else{
-                    //变成无法选中的状态
-                    tv_ok.setBackgroundColor(getResources().getColor(R.color.tv_bg_unreached));
-                    tv_ok.setTextColor(getResources().getColor(R.color.tv_textColor_unreached));
-                    tv_ok.setText("完成");
-                    tv_preview.setTextColor(getResources().getColor(R.color.tv_textColor_unreached));
-                }
+                //改变完成按钮的状态
+                showOkStatus();
+
+            }
+        });
+        //添加item长按跳转到预览界面
+        imageGrid.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                //跳转到所有图片预览界面
+                showPreview(adapter.getImages(),
+                        selectImgs,
+                        position,
+                        params.select_total_num);
+                return true;
             }
         });
         //添加返回按钮点击事件
@@ -222,17 +223,45 @@ public class ImageSelectActivity extends Activity implements View.OnClickListene
         transaction.commit();
     }
 
+    /**
+     * 改变完成按钮的状态
+     */
+    private void showOkStatus(){
+        //判断当前是否有选中的列表
+        if (selectImgs.size() > 0){
+            //如果有选中的,则改变预览和完成按钮的状态
+            tv_ok.setBackgroundColor(getResources().getColor(R.color.tv_bg_reached));
+            tv_ok.setTextColor(getResources().getColor(R.color.tv_textColor_reached));
+            tv_ok.setText("完成(" + selectImgs.size() + "/" + params.select_total_num + ")");
+            tv_preview.setTextColor(getResources().getColor(R.color.tv_textColor_reached));
+        }else{
+            //变成无法选中的状态
+            tv_ok.setBackgroundColor(getResources().getColor(R.color.tv_bg_unreached));
+            tv_ok.setTextColor(getResources().getColor(R.color.tv_textColor_unreached));
+            tv_ok.setText("完成");
+            tv_preview.setTextColor(getResources().getColor(R.color.tv_textColor_unreached));
+        }
+    }
+
     @Override
     public void onClick(View v) {
 
         if (v.getId() == R.id.imageselect_back){
             //返回按钮
+            setResult(Activity.RESULT_CANCELED);
+            ImageSelectActivity.this.finish();
         }else if (v.getId() == R.id.imageselect_ok){
             //完成按钮
             if (selectImgs.size() <= 0){
                 Toast.makeText(mContext, "请至少选择一张图片", Toast.LENGTH_SHORT).show();
             }else{
                 //返回选择的图片数据
+                Intent intent = new Intent();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(Params.KEY_SELECTED_ITEMS, selectImgs);
+                intent.putExtras(bundle);
+                setResult(Activity.RESULT_OK, intent);
+                ImageSelectActivity.this.finish();
             }
         }else if (v.getId() == R.id.imageselect_category_layout
                 || v.getId() == R.id.imageselect_category){
@@ -245,8 +274,14 @@ public class ImageSelectActivity extends Activity implements View.OnClickListene
             }
             transaction.commit();
         }else if (v.getId() == R.id.imageselect_preview){
-            //图片预览界面
-            showPreview();
+            //选中图片预览界面
+            if (selectImgs.size() <= 0){
+                //提示至少选一张图片后再预览
+                Toast.makeText(mContext, "请至少选一张图片后再预览", Toast.LENGTH_SHORT).show();
+            }else{
+                //预览选中的图片
+                showPreview(selectImgs, selectImgs, 0, params.select_total_num);
+            }
         }
     }
 
@@ -259,22 +294,30 @@ public class ImageSelectActivity extends Activity implements View.OnClickListene
             if (resultCode == Activity.RESULT_OK){
                 //获取选择的列表
                 selectImgs = (ArrayList<String>) data.getExtras().getSerializable(PreviewActivity.BUNDLE_SELECTED_IMAGES);
-                //@TODO
+                //改变完成按钮的状态
+                showOkStatus();
+                //变更GridView
+                adapter.setSelectImgs(selectImgs);
+                adapter.notifyDataSetChanged();
             }
         }
     }
 
     /**
      * 跳转到图片预览界面
+     * @param showImages,待预览的图片列表
+     * @param selectImages,当前选中的图片列表
+     * @param current_position,当前预览的图片的位置
+     * @param select_total_num,可以选中的最大张数
      */
-    public void showPreview(){
+    public void showPreview(List<String> showImages, List<String> selectImages, int current_position, int select_total_num){
         Intent intent = new Intent(ImageSelectActivity.this, PreviewActivity.class);
         Bundle bundle = new Bundle();
         //封装待传递的信息
-        bundle.putSerializable(PreviewActivity.BUNDLE_SHOW_IMAGES, (ArrayList)adapter.getImages());
-        bundle.putSerializable(PreviewActivity.BUNDLE_SELECTED_IMAGES, selectImgs);
-        bundle.putInt(PreviewActivity.BUNDLE_CURRENT_POSITION, 0);
-        bundle.putInt(PreviewActivity.BUNDLE_TOTAL_SELECTED, params.select_total_num);
+        bundle.putSerializable(PreviewActivity.BUNDLE_SHOW_IMAGES, (ArrayList)showImages);
+        bundle.putSerializable(PreviewActivity.BUNDLE_SELECTED_IMAGES, (ArrayList)selectImages);
+        bundle.putInt(PreviewActivity.BUNDLE_CURRENT_POSITION, current_position);
+        bundle.putInt(PreviewActivity.BUNDLE_TOTAL_SELECTED, select_total_num);
         intent.putExtras(bundle);
         startActivityForResult(intent, 200);
     }

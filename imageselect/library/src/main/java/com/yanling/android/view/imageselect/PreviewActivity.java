@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -174,13 +175,13 @@ public class PreviewActivity extends Activity implements View.OnClickListener{
             if (current_position < showImages.size() - 1){
                 //向后翻一页
                 Glide.with(PreviewActivity.this).load(showImages.get(++current_position))
-                        .crossFade().into(imageView);
+                        .animate(R.anim.from_right_to_left).into(imageView);
             }
         }else{
             //向前翻页
             if (current_position > 0){
                 Glide.with(PreviewActivity.this).load(showImages.get(--current_position))
-                        .crossFade().into(imageView);
+                        .animate(R.anim.from_left_to_right).into(imageView);
             }
         }
         //改变当前的页数显示
