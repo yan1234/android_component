@@ -347,8 +347,9 @@ public class ImageSelectActivity extends Activity implements View.OnClickListene
                             //设置已经加载过了
                             img.setTag(R.id.image_tag, null);
                         }
-
                     }
+                    //如果当前停止滚动,则手动清理下内存
+                    Glide.get(mContext).clearMemory();
                     break;
                 //滑动做出了抛的动作
                 case AbsListView.OnScrollListener.SCROLL_STATE_FLING:
@@ -444,5 +445,21 @@ public class ImageSelectActivity extends Activity implements View.OnClickListene
             result[1] = screenWidth / column_num;
         }
         return result;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //恢复图片加载请求
+        Glide.with(mContext).resumeRequests();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //暂停图片加载请求
+        Glide.with(mContext).pauseRequests();
+        //释放内存
+        Glide.get(mContext).clearMemory();
     }
 }

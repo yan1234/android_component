@@ -3,14 +3,18 @@ package com.yanling.android.view.imageselect;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bm.library.PhotoView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
@@ -38,12 +42,22 @@ public class PreviewActivity extends Activity implements View.OnClickListener{
     //定义偏移量
     private static final float DEVIATION = 100f;
 
+    //定义复用的ImageView的个数
+    public static final int COUNT_IMAGEVIEW = 4;
+
     //定义界面操作
     private ImageView iv_back;
     private TextView tv_number;
     private TextView tv_ok;
     //定义展示图片的imageview
-    private ImageView imageView;
+    //private ImageView imageView;
+    //定义展示图片的ViewPager和adapter
+    private ViewPager viewPager;
+    private MyPagerAdapter adapter;
+    //定义复用的ViewPager Item
+    private List<ImageView> imageViews = new ArrayList<ImageView>();
+
+
     //定义是否选择的标志
     private ImageView iv_select;
 
@@ -81,7 +95,8 @@ public class PreviewActivity extends Activity implements View.OnClickListener{
         iv_back = (ImageView) this.findViewById(R.id.activity_preview_back);
         tv_number = (TextView)this.findViewById(R.id.activity_preview_number);
         tv_ok = (TextView)this.findViewById(R.id.activity_preview_ok);
-        imageView = (ImageView)this.findViewById(R.id.activity_preview_image);
+        //imageView = (ImageView)this.findViewById(R.id.activity_preview_image);
+        viewPager = (ViewPager)this.findViewById(R.id.activity_preview_viewpager);
         iv_select = (ImageView)this.findViewById(R.id.activity_preview_select);
 
         //设置当前预览的数目
@@ -89,12 +104,20 @@ public class PreviewActivity extends Activity implements View.OnClickListener{
         //设置完成按钮的状态
         showOkStatus();
         //载入图片
-        Glide.with(PreviewActivity.this).load(showImages.get(current_position))
-                .crossFade().into(imageView);
+        /*Glide.with(PreviewActivity.this).load(showImages.get(current_position))
+                .crossFade().into(imageView);*/
         //设置select按钮的状态
         if (selectedImages.contains(showImages.get(current_position))){
             //设置为选中状态
             iv_select.setImageResource(R.drawable.selected);
+        }
+        //初始化复用的列表对象
+        for (int i = 0; i < COUNT_IMAGEVIEW; i++){
+            //ImageView imageView = new ImageView(this);
+            PhotoView imageView = new PhotoView(this);
+            //开启缩放功能
+            imageView.enable();
+            imageViews.add(imageView);
         }
     }
 
@@ -107,7 +130,7 @@ public class PreviewActivity extends Activity implements View.OnClickListener{
         tv_ok.setOnClickListener(this);
         iv_select.setOnClickListener(this);
         //监听预览的onTouch事件, 实现左右滑动切换图片的功能
-        imageView.setOnTouchListener(new View.OnTouchListener() {
+        /*imageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()){
@@ -129,6 +152,18 @@ public class PreviewActivity extends Activity implements View.OnClickListener{
                         break;
                 }
                 return true;
+            }
+        });*/
+        //设置ViewPager的适配器
+        viewPager.setAdapter(adapter = new MyPagerAdapter());
+        //设置预览的位置
+        viewPager.setCurrentItem(current_position);
+        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                //页面载入完成执行页面切换操作
+                pageTurn(position);
             }
         });
     }
@@ -167,11 +202,11 @@ public class PreviewActivity extends Activity implements View.OnClickListener{
 
     /**
      * 翻页操作
-     * @param isToNext，表示是否向后翻页
+     * @param position，当前页面位置
      */
-    private void pageTurn(boolean isToNext){
+    private void pageTurn(int position){
         //标示向后翻页
-        if (isToNext){
+        /*if (isToNext){
             if (current_position < showImages.size() - 1){
                 //向后翻一页
                 Glide.with(PreviewActivity.this).load(showImages.get(++current_position))
@@ -183,7 +218,9 @@ public class PreviewActivity extends Activity implements View.OnClickListener{
                 Glide.with(PreviewActivity.this).load(showImages.get(--current_position))
                         .animate(R.anim.from_left_to_right).into(imageView);
             }
-        }
+        }*/
+        //更新当前页数
+        current_position = position;
         //改变当前的页数显示
         tv_number.setText(current_position + 1 + "/" + showImages.size());
         //翻页完成后判断当前的是否被选中
@@ -192,6 +229,8 @@ public class PreviewActivity extends Activity implements View.OnClickListener{
         }else{
             iv_select.setImageResource(R.drawable.unselected);
         }
+        //页面切换完成后,主动释放下内存
+        Glide.get(this).clearMemory();
     }
 
     /**
@@ -211,4 +250,56 @@ public class PreviewActivity extends Activity implements View.OnClickListener{
         }
     }
 
+    /**
+     * 实现ViewPager适配
+     */
+    class MyPagerAdapter extends PagerAdapter{
+
+        @Override
+        public int getCount() {
+            return showImages.size();
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            //初始化Item
+            ImageView itemView = imageViews.get(position % COUNT_IMAGEVIEW);
+            if (itemView.getParent() != null){
+                ((ViewGroup)itemView.getParent()).removeView(itemView);
+            }
+            //加载数据
+            Glide.with(PreviewActivity.this).load(showImages.get((position)))
+                    .crossFade().into(itemView);
+            //将item添加到容器中
+            container.addView(itemView, 0);
+            return itemView;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            ImageView itemView = imageViews.get(position % COUNT_IMAGEVIEW);
+            container.removeView(itemView);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //恢复请求
+        Glide.with(PreviewActivity.this).resumeRequests();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //暂停请求
+        Glide.with(PreviewActivity.this).pauseRequests();
+        //释放内存
+        Glide.get(PreviewActivity.this).clearMemory();
+    }
 }
