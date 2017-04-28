@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!--　主界面区域包含两个ListView,左边的为内容,右边的为字符索引列表 -->
+    <!--　主内容列表 -->
+    <ListView
+        android:id="@+id/fragment_lv_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/fragment_lv_index"></ListView>
+
+    <!-- 字符索引列表 -->
+    <ListView
+        android:id="@+id/fragment_lv_index"
+        android:layout_width="20dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:dividerHeight="0dp"></ListView>
+
+    <!-- 中心的索引预览 -->
+    <TextView
+        android:id="@+id/fragment_tv_preview"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:textSize="40sp"
+        android:background="#123456"
+        android:text="A"/>
+
+</RelativeLayout>

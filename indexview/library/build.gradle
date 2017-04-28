@@ -1,0 +1,5 @@
+apply from: '../../common_android_library.gradle'
+
+dependencies{
+    compile 'com.android.support:recyclerview-v7:22.0.0'
+}
