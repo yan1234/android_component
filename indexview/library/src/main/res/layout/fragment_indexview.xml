@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!--　主界面区域包含两个ListView,左边的为内容,右边的为字符索引列表 -->
+    <!--　主界面区域包含两个列表,左边的为内容,右边的为字符索引列表 -->
     <!--　主内容列表 -->
-    <ListView
-        android:id="@+id/fragment_lv_content"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/fragment_rv_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toLeftOf="@+id/fragment_lv_index"></ListView>
+        android:layout_toLeftOf="@+id/fragment_lv_index"></android.support.v7.widget.RecyclerView>
 
     <!-- 字符索引列表 -->
     <ListView

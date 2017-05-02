@@ -11,14 +11,11 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import javax.crypto.MacSpi;
 
 /**
  * 索引界面的Fragment
@@ -36,7 +33,7 @@ public class IndexViewFragment extends Fragment {
     private View view;
 
     //定义主内容区域和索引区域listview
-    private ListView lv_content;
+    private RecyclerView rv_content;
     private ListView lv_index;
 
     //定义中心的索引预览
@@ -44,8 +41,6 @@ public class IndexViewFragment extends Fragment {
 
     //定义索引列表的适配器
     private IndexAdapter indexAdapter;
-    //定义内容区域的适配器
-    private ContentAdapter contentAdapter;
 
     @Override
     public void onAttach(Activity activity) {
@@ -68,13 +63,12 @@ public class IndexViewFragment extends Fragment {
      * 初始化界面布局
      */
     private void initView(){
-        lv_content = (ListView)view.findViewById(R.id.fragment_lv_content);
+        rv_content = (RecyclerView) view.findViewById(R.id.fragment_rv_content);
         lv_index = (ListView)view.findViewById(R.id.fragment_lv_index);
         tv_preview = (TextView)view.findViewById(R.id.fragment_tv_preview);
 
         //绑定适配器
         lv_index.setAdapter(indexAdapter = new IndexAdapter());
-        lv_content.setAdapter(contentAdapter = new ContentAdapter());
     }
 
     /**
@@ -114,8 +108,10 @@ public class IndexViewFragment extends Fragment {
         tv_preview.setText("" + index_list[position]);
         tv_preview.setVisibility(View.VISIBLE);
         //内容区域滑动到索引指定的位置
-        lv_content.smoothScrollByOffset(position - lv_content.getFirstVisiblePosition());
-
+        //根据索引列表计算内容列表的位置
+        int rv_position = ((RecyclerContentAdapter)rv_content.getAdapter())
+                .getPosition(position, RecyclerContentAdapter.ITEM_TYPE_INDEX);
+        rv_content.smoothScrollToPosition(rv_position);
     }
 
     //定义索引列表, 首位是'↑',表示回到顶部
@@ -132,7 +128,6 @@ public class IndexViewFragment extends Fragment {
 
         //Item高度
         private static final int ITEM_HEIGHT = 50;
-
 
         public IndexAdapter(){
 
@@ -168,105 +163,7 @@ public class IndexViewFragment extends Fragment {
         }
     }
 
-    /**
-     * 内容区域的适配器
-     */
-    class ContentAdapter extends BaseAdapter{
-
-        @Override
-        public int getCount() {
-            return index_list.length;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return index_list[position];
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder viewHolder = null;
-            if (convertView == null){
-                //加载内容item布局
-                convertView = LayoutInflater.from(mContext)
-                        .inflate(R.layout.item_lv_content, null);
-                viewHolder = new ViewHolder();
-                viewHolder.tv_title = (TextView)convertView.findViewById(R.id.item_list_content_title);
-                viewHolder.recyclerView = (RecyclerView)convertView.findViewById(R.id.item_list_content_main);
-                convertView.setTag(viewHolder);
-            }else{
-                viewHolder = (ViewHolder) convertView.getTag();
-            }
-            viewHolder.tv_title.setText("" + index_list[position]);
-            //手动设置高度
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, 200
-            );
-            //viewHolder.recyclerView.setLayoutParams(params);
-            viewHolder.recyclerView.setLayoutManager(new MeasuredLinearLayoutManager(mContext));
-            recyclerAdapter.setKey(""+index_list[position]);
-            viewHolder.recyclerView.setAdapter(recyclerAdapter);
-            return convertView;
-        }
-
-        class ViewHolder{
-            public TextView tv_title;
-            public RecyclerView recyclerView;
-        }
-
+    public RecyclerView getRv_content() {
+        return rv_content;
     }
-
-    //定义RecyclerAdapter对象
-    private RecyclerAdapter recyclerAdapter;
-
-    public void setRecyclerAdapter(RecyclerAdapter adapter){
-        this.recyclerAdapter = adapter;
-    }
-
-
-    /**
-     * 定义RecyclerView的适配器对象
-     */
-    public static abstract class RecyclerAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
-
-        public String key;
-
-        public String getKey() {
-            return key;
-        }
-
-        public void setKey(String key) {
-            this.key = key;
-        }
-    }
-
-    public class MeasuredLinearLayoutManager extends LinearLayoutManager{
-
-        private int maxHeight = 0;
-
-        public MeasuredLinearLayoutManager(Context context) {
-            super(context);
-        }
-
-        @Override
-        public void onMeasure(RecyclerView.Recycler recycler, RecyclerView.State state, int widthSpec, int heightSpec) {
-            for (int i = 0; i < getItemCount(); i++){
-                View child = recycler.getViewForPosition(i);
-                RecyclerView.LayoutParams params = (RecyclerView.LayoutParams)child.getLayoutParams();
-                child.measure(widthSpec, View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-                int height = child.getMeasuredHeight()
-                        + getPaddingTop() + getPaddingBottom()
-                        + params.topMargin + params.bottomMargin;
-                maxHeight += height;
-            }
-            heightSpec = View.MeasureSpec.makeMeasureSpec(maxHeight, View.MeasureSpec.AT_MOST);
-            super.onMeasure(recycler, state, widthSpec, heightSpec);
-        }
-    }
-
 }
