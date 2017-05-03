@@ -112,17 +112,50 @@ public abstract class RecyclerContentAdapter extends RecyclerView.Adapter {
         return position;
     }
 
+    /**
+     * 根据指定位置返回View类型
+     * @param position，位置
+     * @return，返回View类型 (ITEM_TYPE_INDEX, ITEM_TYPE_CONTENT)
+     */
     public abstract int getItemViewType(int position);
 
+    /**
+     * 返回索引的长度
+     * @return
+     */
     public abstract int getIndexCount();
 
+    /**
+     * 返回内容列表的长度
+     * @return
+     */
     public abstract int getContentCount();
 
+    /**
+     * 构造索引的ViewHolder
+     * @param parent,父容器
+     * @return
+     */
     public abstract RecyclerView.ViewHolder createIndexHolder(ViewGroup parent);
 
+    /**
+     * 构造内容区域的ViewHolder
+     * @param parent,父容器
+     * @return
+     */
     public abstract RecyclerView.ViewHolder createContentHolder(ViewGroup parent);
 
+    /**
+     * 将数据绑定到索引的ViewHolder上面去
+     * @param holder，ViewHolder
+     * @param position, 当前列表的位置(注意要根据当前列表的位置计算出实际数据的位置，提供＠Method getRealPosition(position)方法)
+     */
     public abstract void bindIndexHolder(RecyclerView.ViewHolder holder, int position);
 
+    /**
+     * 将数据绑定到内容的ViewHolder上面去
+     * @param holder，内容的ViewHolder
+     * @param position, 当前列表的位置(同样要计算实际数据的位置)
+     */
     public abstract void bindContentHolder(RecyclerView.ViewHolder holder, int position);
 }

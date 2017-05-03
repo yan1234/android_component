@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -66,7 +67,8 @@ public class IndexViewFragment extends Fragment {
         rv_content = (RecyclerView) view.findViewById(R.id.fragment_rv_content);
         lv_index = (ListView)view.findViewById(R.id.fragment_lv_index);
         tv_preview = (TextView)view.findViewById(R.id.fragment_tv_preview);
-
+        //隐藏预览界面
+        tv_preview.setVisibility(View.INVISIBLE);
         //绑定适配器
         lv_index.setAdapter(indexAdapter = new IndexAdapter());
     }
@@ -109,9 +111,15 @@ public class IndexViewFragment extends Fragment {
         tv_preview.setVisibility(View.VISIBLE);
         //内容区域滑动到索引指定的位置
         //根据索引列表计算内容列表的位置
-        int rv_position = ((RecyclerContentAdapter)rv_content.getAdapter())
-                .getPosition(position, RecyclerContentAdapter.ITEM_TYPE_INDEX);
-        rv_content.smoothScrollToPosition(rv_position);
+        if (rv_content.getAdapter() != null){
+            int rv_position = ((RecyclerContentAdapter)rv_content.getAdapter())
+                    .getPosition(position, RecyclerContentAdapter.ITEM_TYPE_INDEX);
+            LinearLayoutManager layoutManager = (LinearLayoutManager)rv_content.getLayoutManager();
+            //从底部开始渲染
+            layoutManager.setStackFromEnd(true);
+            //滑动到指定位置
+            layoutManager.scrollToPositionWithOffset(rv_position, 0);
+        }
     }
 
     //定义索引列表, 首位是'↑',表示回到顶部
@@ -125,13 +133,6 @@ public class IndexViewFragment extends Fragment {
      * 定义索引列表的适配器
      */
     class IndexAdapter extends BaseAdapter{
-
-        //Item高度
-        private static final int ITEM_HEIGHT = 50;
-
-        public IndexAdapter(){
-
-        }
 
         @Override
         public int getCount() {
@@ -153,8 +154,8 @@ public class IndexViewFragment extends Fragment {
             //加载布局数据
             convertView = LayoutInflater.from(mContext)
                     .inflate(R.layout.item_lv_index, null);
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ITEM_HEIGHT
+            AbsListView.LayoutParams params = new AbsListView.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
             );
             convertView.setLayoutParams(params);
             TextView tv = (TextView)convertView.findViewById(R.id.item_list_index_tv);

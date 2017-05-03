@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#FFFFFF</color>
+    <!--　青灰色字体 -->
+    <color name="green_gray">#404040</color>
+    <color name="blue">#123456</color>
+</resources>
