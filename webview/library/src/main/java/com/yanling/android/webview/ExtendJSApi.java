@@ -4,6 +4,8 @@ package com.yanling.android.webview;
 import android.os.Handler;
 import android.webkit.JavascriptInterface;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * 扩展的js调用java的api类
  * 该类主要包括2部分：
@@ -34,6 +36,16 @@ public class ExtendJSApi {
     public void callNativeApi(final String methodName, final String data, final String callback){
         //根据方法名获取要调用的接口方法
         webViewClient.handlerJSCall(methodName, data, callback);
+
+        try {
+            this.getClass().getMethod(methodName).invoke(this, data);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
 }
