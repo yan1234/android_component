@@ -1,5 +1,7 @@
 package com.yanling.android.webview;
 
+import android.util.Log;
+
 /**
  * 扩展的异常类
  * @author yanling
@@ -7,9 +9,13 @@ package com.yanling.android.webview;
  */
 public class ExtendException extends Exception{
 
+    private static final String TAG = ExtendException.class.getSimpleName();
+
     //定义错误编码
     //不是在主线程中运行
     public static final String CODE_NOT_RUN_ON_MAIN_THREAD = "1";
+    //本地接口不存在
+    public static final String NATIVE_API_NOT_FOUND = "2";
 
     //定义错误编码
     private String errCode;
@@ -41,5 +47,10 @@ public class ExtendException extends Exception{
 
     public void setErrMsg(String errMsg) {
         this.errMsg = errMsg;
+    }
+
+    @Override
+    public String getMessage() {
+        return "[" + getErrCode() + "], " + getErrMsg();
     }
 }

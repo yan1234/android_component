@@ -1,11 +1,9 @@
 package com.yanling.android.webview;
 
+import android.util.Log;
 import android.webkit.JavascriptInterface;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 /**
  * JS端调用Native管理器
@@ -22,8 +20,6 @@ public class ExtendJSApiManager {
     private static ExtendJSApiManager mInstance;
     //定义Map保存待注册的Native接口
     private Map<String, Class> apiMap = new HashMap<>();
-    //定义弱引用Map保存执行过得Method方法，主要是用来提升反射效率
-    private WeakHashMap<String, Method> methodWeakHashMap = new WeakHashMap<>();
 
     /**
      * 单例模式初始化管理器对象
@@ -68,56 +64,79 @@ public class ExtendJSApiManager {
         }
     }
 
-    private Object callMethod(String apiKey, String targetMethod, String data){
-        //查找到所需要调用的API
-        Class apiClass = apiMap.get(apiKey);
-        if (apiClass != null){
-            //查找该method是否已经存在缓存中
-            Method  method = methodWeakHashMap.get(apiKey + targetMethod);
-            if ( method== null){
-                //通过反射获取将要执行的Method
-                try {
-                    method = apiClass.getMethod(targetMethod);
-                    //缓存当前的method
-                    methodWeakHashMap.put(apiKey + targetMethod, method);
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                }
-            }
-            //直接从缓存中获取数据并执行
+    /**
+     * 实例化JSCall对象
+     * @param apiKey，JSCall类对应key值
+     * @return，返回JSCall对象
+     * @throws ExtendException
+     */
+    public static AbstractJSCall newJSCall(String apiKey) throws ExtendException{
+        //通过apiKey找到对象的实例对象
+        Class clazz = mInstance.apiMap.get(apiKey);
+        if (clazz != null && clazz.getSuperclass().equals(AbstractJSCall.class)){
+            //通过类实例化该对象
             try {
-                Object obj = method.invoke(apiClass, data);
-                return obj;
+                AbstractJSCall jsCall = (AbstractJSCall)clazz.newInstance();
+                return jsCall;
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+                throw new ExtendException(ExtendException.NATIVE_API_NOT_FOUND, e.getMessage());
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
+                throw new ExtendException(ExtendException.NATIVE_API_NOT_FOUND, e.getMessage());
             }
+        }else{
+            throw new ExtendException(ExtendException.NATIVE_API_NOT_FOUND, "Native Api Not Found");
         }
-        return null;
     }
 
+    /**
+     * 暴露给JS端的Java对象API
+     */
     public static class ExtendJSApi{
 
-
         /**
-         * JS同步执行Native端接口并获取返回值(返回值可以为空"")
+         * JS同步执行Native端接口并获取返回值
          * 注意这里由于JS和Native通信只能在主线程中进行，所以该方法只能用于简单数据请求返回处理场景
-         * @return，返回执行数据
+         * @param apiKey 对应的接口key值
+         * @param action 执行操作类型
+         * @param data 传递的数据
+         * @return，返回执行情况
          */
         @JavascriptInterface
-        public String execute(String apiKey, String methodName, String data){
-            //通过反射执行指定的方法并获取返回值
-            Object obj = mInstance.callMethod(apiKey, methodName, data);
-            return (String)obj;
+        public String execute(String apiKey, String action, String data){
+            try {
+                //实例化JSCall
+                AbstractJSCall jsCall = newJSCall(apiKey);
+                //执行同步操作并返回数据
+                return jsCall.jsCall(action, data, "", false);
+            } catch (ExtendException e) {
+                e.printStackTrace();
+                Log.e(TAG, e.getMessage());
+            }
+            return "";
         }
 
+        /**
+         * JS异步执行Native接口
+         * @param apiKey 待执行接口key值
+         * @param action 操作类型
+         * @param callbackId JS端回调的callback id值
+         * @param data，传递数据
+         * @return，返回执行情况
+         */
         @JavascriptInterface
-        public void enqueue(String apiKey, String methodName, String callbackId, String data){
-            //通过反射执行指定方法，并通过callbackId异步返回
-            Object obj = mInstance.callMethod(apiKey, methodName, data);
-            //异步回调Native to JS
-            //@TODO
+        public String enqueue(String apiKey, String action, String callbackId, String data){
+            try {
+                //实例化JSCall
+                AbstractJSCall jsCall = newJSCall(apiKey);
+                //执行异步操作
+                jsCall.jsCall(action, data, callbackId, true);
+            } catch (ExtendException e) {
+                e.printStackTrace();
+                Log.e(TAG, e.getMessage());
+            }
+            return "";
         }
     }
 }
