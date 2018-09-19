@@ -15,7 +15,9 @@ public class ExtendException extends Exception{
     //不是在主线程中运行
     public static final String CODE_NOT_RUN_ON_MAIN_THREAD = "1";
     //本地接口不存在
-    public static final String NATIVE_API_NOT_FOUND = "2";
+    public static final String CODE_NATIVE_API_NOT_FOUND = "2";
+    public static final String MSG_NATIVE_API_NOT_FOUND = "";
+
 
     //定义错误编码
     private String errCode;

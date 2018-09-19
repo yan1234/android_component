@@ -10,8 +10,8 @@ import android.os.Looper;
  */
 public abstract class AbstractJSCall {
 
-    //定义JS端回调的Callback id
-    private String callbackId;
+    //定义JS端回调的Callback
+    private String callback;
 
     /**
      * 同步执行Native调用
@@ -32,22 +32,19 @@ public abstract class AbstractJSCall {
 
     /**
      * JS端调用Native接口方法
-     * @param action 操作类型
-     * @param data 传递数据
-     * @param callbackId 异步调用时回调JS端id,同步时为空
-     * @param isAsync true: 异步调用; false: 同步调用
+     * @param entity JS请求的数据
      * @return
      * @throws ExtendException
      */
-    public final String jsCall(String action, String data, String callbackId, boolean isAsync) throws ExtendException{
-        if (!isAsync){
+    public final String jsCall(JSCallEntity entity) throws ExtendException{
+        if (!entity.isAsync()){
             //同步执行
-            return execute(action, data);
+            return execute(entity.getAction(), entity.getData());
         }else{
             //异步执行
             //保存JS端回调的callback id
-            this.callbackId = callbackId;
-            return enqueue(action, data);
+            this.callback = entity.getCallback();
+            return enqueue(entity.getAction(), entity.getData());
         }
     }
 
