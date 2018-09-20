@@ -1,7 +1,12 @@
-package com.yanling.android.webview;
+package com.yanling.android.webview.mode;
 
-import android.util.Log;
 import android.webkit.JavascriptInterface;
+
+import com.yanling.android.webview.AbstractJSCall;
+import com.yanling.android.webview.ExtendException;
+import com.yanling.android.webview.ExtendJSCallManager;
+import com.yanling.android.webview.data.ExtendJSURL;
+import com.yanling.android.webview.data.JSCallEntity;
 
 /**
  * 自定义扩展的JavaScript Interface接口

@@ -1,4 +1,4 @@
-package com.yanling.android.webview;
+package com.yanling.android.webview.data;
 
 /**
  * JS请求的信息的实体
