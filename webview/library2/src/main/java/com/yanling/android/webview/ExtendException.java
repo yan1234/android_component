@@ -1,7 +1,5 @@
 package com.yanling.android.webview;
 
-import android.util.Log;
-
 /**
  * 扩展的异常类
  * @author yanling
@@ -12,11 +10,15 @@ public class ExtendException extends Exception{
     private static final String TAG = ExtendException.class.getSimpleName();
 
     //定义错误编码
-    //不是在主线程中运行
-    public static final String CODE_NOT_RUN_ON_MAIN_THREAD = "1";
     //本地接口不存在
-    public static final String CODE_NATIVE_API_NOT_FOUND = "2";
-    public static final String MSG_NATIVE_API_NOT_FOUND = "";
+    public static final String CODE_NATIVE_API_NOT_FOUND = "-1";
+    public static final String MSG_NATIVE_API_NOT_FOUND = "Native Api Not Found";
+    //内部系统处理异常
+    public static final String CODE_INTERNAL_EXCEPTION = "-2";
+    public static final String MSG_INTERNAL_EXCEPTION = "Internal Exception";
+    //数据协议格式错误异常
+    public static final String CODE_URL_DATA_WRONG = "-3";
+    public static final String MSG_URL_DATA_WRONG = "Url Data Is Wrong";
 
 
     //定义错误编码

@@ -17,24 +17,30 @@ import com.yanling.android.webview.data.JSCallEntity;
  */
 public class ExtendWebChromeClient extends WebChromeClient {
 
+    private static final String TAG = ExtendWebChromeClient.class.getSimpleName();
+
     @Override
     public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
-        //判断是否是JS端调用Native
-        if (ExtendJSURL.isJSCallURL(url)){
-            JSCallEntity entity = new JSCallEntity();
-            try {
-                //获取传递的内容数据
-                String apiKey = ExtendJSURL.parseURL(url, entity);
-                //实例化JSCall
-                AbstractJSCall jsCall = ExtendJSCallManager.getInstance().newJSCall(apiKey);
-                //执行Native接口方法并返回数据
-                String resultData = jsCall.jsCall(entity);
-                result.confirm(resultData);
-            } catch (ExtendException e) {
-                e.printStackTrace();
-            }
-            //返回true表示取消当前请求
+        JSCallEntity entity = new JSCallEntity();
+        try {
+            //获取传递的内容数据
+            String apiKey = ExtendJSURL.parseURL(url, entity);
+            //实例化JSCall
+            AbstractJSCall jsCall = ExtendJSCallManager.getInstance().newJSCall(apiKey);
+            //执行Native接口方法并返回数据
+            String resultData = jsCall.jsCall(entity);
+            result.confirm(resultData);
+            //返回拦截处理
             return true;
+        } catch (ExtendException e) {
+            e.printStackTrace();
+            ExtendJSCallManager.log(ExtendJSCallManager.LogLevel.ERROR, TAG, e.getMessage());
+            //判断不是url协议格式异常，则也拦截处理
+            if (!e.getErrMsg().equals(ExtendException.CODE_URL_DATA_WRONG)){
+                //返回异常
+                result.confirm(e.getMessage());
+                return true;
+            }
         }
         //默认返回false,不进行任何处理
         return super.onJsPrompt(view, url, message, defaultValue, result);

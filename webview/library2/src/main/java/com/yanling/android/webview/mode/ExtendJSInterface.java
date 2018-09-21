@@ -27,20 +27,20 @@ public final class ExtendJSInterface {
      */
     @JavascriptInterface
     public String execute(String url){
-        if (ExtendJSURL.isJSCallURL(url)){
-            JSCallEntity entity = new JSCallEntity();
-            try {
-                //获取传递的内容数据
-                String apiKey = ExtendJSURL.parseURL(url, entity);
-                //实例化JSCall
-                AbstractJSCall jsCall = ExtendJSCallManager.getInstance().newJSCall(apiKey);
-                //执行Native接口方法并返回数据
-                return jsCall.jsCall(entity);
-            } catch (ExtendException e) {
-                e.printStackTrace();
-            }
+        JSCallEntity entity = new JSCallEntity();
+        try {
+            //获取传递的内容数据
+            String apiKey = ExtendJSURL.parseURL(url, entity);
+            //实例化JSCall
+            AbstractJSCall jsCall = ExtendJSCallManager.getInstance().newJSCall(apiKey);
+            //执行Native接口方法并返回数据
+            return jsCall.jsCall(entity);
+        } catch (ExtendException e) {
+            e.printStackTrace();
+            ExtendJSCallManager.log(ExtendJSCallManager.LogLevel.ERROR, TAG, e.getMessage());
+            //返回异常数据
+            return e.getMessage();
         }
-        return "";
     }
 
 }

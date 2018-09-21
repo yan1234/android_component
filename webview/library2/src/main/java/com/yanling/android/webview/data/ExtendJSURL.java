@@ -2,6 +2,7 @@ package com.yanling.android.webview.data;
 
 
 import com.yanling.android.webview.ExtendException;
+import com.yanling.android.webview.ExtendJSCallManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,6 +15,8 @@ import org.json.JSONObject;
  * @date 2018-09-19
  */
 public class ExtendJSURL {
+
+    private static final String TAG = ExtendJSURL.class.getSimpleName();
 
     //定义URL协议的前缀
     private static final String PREFIX_STRING = "jscall://";
@@ -29,7 +32,7 @@ public class ExtendJSURL {
     public static String parseURL(String url, JSCallEntity entity) throws ExtendException{
         //1、校验url数据的合法性
         if (!isJSCallURL(url)){
-            throw new ExtendException(ExtendException.CODE_NATIVE_API_NOT_FOUND, ExtendException.MSG_NATIVE_API_NOT_FOUND);
+            throw new ExtendException(ExtendException.CODE_URL_DATA_WRONG, ExtendException.MSG_URL_DATA_WRONG);
         }
         //截取出apiKey和data数据域
         String[] tmp = url.substring(PREFIX_STRING.length()).split("\\?");
@@ -47,10 +50,11 @@ public class ExtendJSURL {
                 return apiKey;
             } catch (JSONException e) {
                 e.printStackTrace();
-                throw new ExtendException();
+                ExtendJSCallManager.log(ExtendJSCallManager.LogLevel.ERROR, TAG, e.getMessage());
+                throw new ExtendException(ExtendException.CODE_URL_DATA_WRONG, ExtendException.MSG_URL_DATA_WRONG);
             }
         }else{
-            throw new ExtendException();
+            throw new ExtendException(ExtendException.CODE_URL_DATA_WRONG, ExtendException.MSG_URL_DATA_WRONG);
         }
     }
 
@@ -59,7 +63,7 @@ public class ExtendJSURL {
      * @param url，待校验的url信息
      * @return
      */
-    public static boolean isJSCallURL(String url){
+    private static boolean isJSCallURL(String url){
         if (url != null && url.startsWith(PREFIX_STRING)){
             return true;
         }

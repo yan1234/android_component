@@ -3,6 +3,7 @@ package com.yanling.android.webview;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
 
@@ -26,6 +27,11 @@ public final class ExtendJSCallManager {
     //WebChromeClient 的onJsPrompt 拦截prompt模式
     public static final String MODE_INTERCEPT_PROMPT = "MODE_INTERCEPT_PROMPT";
 
+    //定义JS端Callbacks回调对象名字空间,成功回调和失败回调方法
+    private static final String JS_CALLBACK_NAME = "callbacks";
+    private static final String JS_CALLBACK_SUCCESS = "success";
+    private static final String JS_CALLBACK_ERROR = "error";
+
     //定义JSApi管理器对象
     private static ExtendJSCallManager mInstance;
     //定义Map保存待注册的Native接口
@@ -34,7 +40,10 @@ public final class ExtendJSCallManager {
     private Handler handler = new Handler(Looper.getMainLooper());
     //定义变量保存JSCall的模式，默认采用MODE_INTERCEPT_PROMPT
     private String jsCallMode = MODE_INTERCEPT_PROMPT;
-
+    //定义变量保存WebView对象
+    private WebView webView;
+    //定义是否开启日志记录（默认开启）
+    private static boolean isLog = true;
 
     /**
      * 单例模式初始化管理器对象
@@ -57,6 +66,23 @@ public final class ExtendJSCallManager {
     public ExtendJSCallManager init(String jsCallMode){
         this.jsCallMode = jsCallMode;
         return this;
+    }
+
+    /**
+     * 设置日志开关，默认开启
+     * @param isLog
+     */
+    public void setLog(boolean isLog){
+        ExtendJSCallManager.isLog = isLog;
+    }
+
+
+    /**
+     * 注入WebView对象
+     * @param webView
+     */
+    public void injectWebView(WebView webView){
+        this.webView = webView;
     }
 
 
@@ -135,11 +161,9 @@ public final class ExtendJSCallManager {
         runOnUIThread(new Runnable() {
             @Override
             public void run() {
-                if (status){
-                    //处理成功回调
-                }else{
-                    //处理失败回调
-                }
+                //根据状态回调指定的方法（success/error）
+                String tmp = status ? JS_CALLBACK_SUCCESS : JS_CALLBACK_ERROR;
+                executeJS(webView, JS_CALLBACK_NAME + "." + callback + "." + tmp, null, result);
             }
         });
     }
@@ -172,13 +196,16 @@ public final class ExtendJSCallManager {
                 return jsCall;
             } catch (InstantiationException e) {
                 e.printStackTrace();
-                throw new ExtendException(ExtendException.CODE_NATIVE_API_NOT_FOUND, e.getMessage());
+                log(LogLevel.ERROR, TAG, e.getMessage());
+                throw new ExtendException(ExtendException.CODE_INTERNAL_EXCEPTION, ExtendException.MSG_INTERNAL_EXCEPTION);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
-                throw new ExtendException(ExtendException.CODE_NATIVE_API_NOT_FOUND, e.getMessage());
+                log(LogLevel.ERROR, TAG, e.getMessage());
+                throw new ExtendException(ExtendException.CODE_INTERNAL_EXCEPTION, ExtendException.MSG_INTERNAL_EXCEPTION);
             }
         }else{
-            throw new ExtendException(ExtendException.CODE_NATIVE_API_NOT_FOUND, "Native Api Not Found");
+            //抛出接口不存在异常
+            throw new ExtendException(ExtendException.CODE_NATIVE_API_NOT_FOUND, ExtendException.MSG_NATIVE_API_NOT_FOUND);
         }
     }
 
@@ -206,12 +233,50 @@ public final class ExtendJSCallManager {
         }
         //最后拼接结束的反括号
         sb.append(")");
+        //日志记录
+        log(LogLevel.DEBUG, TAG, "执行js方法："  + sb.toString());
         //Android 4.4以下使用loadUrl
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT){
             webView.loadUrl(sb.toString());
         }else{
             webView.evaluateJavascript(sb.toString(), valueCallback);
         }
+    }
+
+    /**
+     * 自定义日志记录，可以通过开关控制
+     * @param logLevel
+     * @param tag
+     * @param msg
+     */
+    public static void log(LogLevel logLevel, String tag, String msg){
+        //判断日志记录是否开启
+        if (isLog){
+            switch (logLevel){
+                case ASSERT:
+                    break;
+                case DEBUG:
+                    Log.d(tag, msg);
+                    break;
+                case ERROR:
+                    Log.e(tag, msg);
+                    break;
+                case INFO:
+                    Log.e(tag, msg);
+                    break;
+                case VERBOSE:
+                    Log.i(tag, msg);
+                    break;
+                case WARN:
+                    Log.w(tag, msg);
+                    break;
+            }
+        }
+    }
+
+    //定义日志记录级别的枚举对象
+    public enum LogLevel{
+        ASSERT, DEBUG, ERROR, INFO, VERBOSE, WARN
     }
 
 }

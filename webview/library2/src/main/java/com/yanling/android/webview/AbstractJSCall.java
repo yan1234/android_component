@@ -19,7 +19,7 @@ public abstract class AbstractJSCall {
      * @param data js端传递的参数
      * @return，返回给js端结果
      */
-    public abstract String execute(String action, String data) throws ExtendException;
+    public abstract String execute(String action, String data);
 
     /**
      * 异步执行Native调用
@@ -28,15 +28,14 @@ public abstract class AbstractJSCall {
      * @return 返回执行情况
      * @throws ExtendException
      */
-    public abstract String enqueue(String action, String data) throws ExtendException;
+    public abstract void enqueue(String action, String data);
 
     /**
      * JS端调用Native接口方法
      * @param entity JS请求的数据
      * @return
-     * @throws ExtendException
      */
-    public final String jsCall(JSCallEntity entity) throws ExtendException{
+    public final String jsCall(JSCallEntity entity){
         if (!entity.isAsync()){
             //同步执行
             return execute(entity.getAction(), entity.getData());
@@ -44,7 +43,8 @@ public abstract class AbstractJSCall {
             //异步执行
             //保存JS端回调的callback id
             this.callback = entity.getCallback();
-            return enqueue(entity.getAction(), entity.getData());
+            enqueue(entity.getAction(), entity.getData());
+            return "";
         }
     }
 
