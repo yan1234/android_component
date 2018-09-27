@@ -24,12 +24,12 @@ public class ExtendWebChromeClient extends WebChromeClient {
         JSCallEntity entity = new JSCallEntity();
         try {
             //获取传递的内容数据
-            String apiKey = ExtendJSURL.parseURL(url, entity);
+            String apiKey = ExtendJSURL.parseURL(message, entity);
             //实例化JSCall
             AbstractJSCall jsCall = ExtendJSCallManager.getInstance().newJSCall(apiKey);
             //执行Native接口方法并返回数据
             String resultData = jsCall.jsCall(entity);
-            result.confirm(resultData);
+            result.confirm(ExtendJSURL.packageResult(resultData, true));
             //返回拦截处理
             return true;
         } catch (ExtendException e) {
@@ -38,7 +38,7 @@ public class ExtendWebChromeClient extends WebChromeClient {
             //判断不是url协议格式异常，则也拦截处理
             if (!e.getErrMsg().equals(ExtendException.CODE_URL_DATA_WRONG)){
                 //返回异常
-                result.confirm(e.getMessage());
+                result.confirm(ExtendJSURL.packageResult(e.getMessage(), false));
                 return true;
             }
         }

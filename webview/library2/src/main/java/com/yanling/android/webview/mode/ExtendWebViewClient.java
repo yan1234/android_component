@@ -21,11 +21,13 @@ public class ExtendWebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         JSCallEntity entity = new JSCallEntity();
+        //定义JSCall对象
+        AbstractJSCall jsCall = null;
         try {
             //获取传递的内容数据
             String apiKey = ExtendJSURL.parseURL(url, entity);
             //实例化JSCall
-            AbstractJSCall jsCall = ExtendJSCallManager.getInstance().newJSCall(apiKey);
+            jsCall = ExtendJSCallManager.getInstance().newJSCall(apiKey);
             //执行Native接口方法并返回数据
             jsCall.jsCall(entity);
             //返回拦截处理
@@ -34,7 +36,12 @@ public class ExtendWebViewClient extends WebViewClient {
             e.printStackTrace();
             ExtendJSCallManager.log(ExtendJSCallManager.LogLevel.ERROR, TAG, e.getMessage());
             //判断不是url协议格式异常，则也拦截处理
-            if (!e.getErrMsg().equals(ExtendException.CODE_URL_DATA_WRONG)){
+            if (!e.getErrCode().equals(ExtendException.CODE_URL_DATA_WRONG)){
+                //判断是否是异步调用（该方法同步调用没有返回值）
+                if (jsCall != null && entity.isAsync()){
+                    //回调异常信息
+                    jsCall.error(e.getMessage());
+                }
                 return true;
             }
         }

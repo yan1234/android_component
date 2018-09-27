@@ -9,6 +9,7 @@ import android.webkit.WebView;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * 自定义扩展的JSCall管理器,负责整个JS调用Native的调度控制
@@ -35,7 +36,9 @@ public final class ExtendJSCallManager {
     //定义JSApi管理器对象
     private static ExtendJSCallManager mInstance;
     //定义Map保存待注册的Native接口
-    private Map<String, Class> apiMap = new HashMap<>();
+    private Map<String, String> apiMap = new HashMap<>();
+    //定义弱引用缓存Class对象
+    private WeakHashMap<String, Class> apiMapClass = new WeakHashMap<>();
     //定义主线程的handler对象用于线程切换操作
     private Handler handler = new Handler(Looper.getMainLooper());
     //定义变量保存JSCall的模式，默认采用MODE_INTERCEPT_PROMPT
@@ -89,20 +92,20 @@ public final class ExtendJSCallManager {
     /**
      * 注册Native端接口
      * @param apiKey，接口对应的apiKey值，唯一性
-     * @param apiClass，接口对应的Class对象，用于后面通过反射进行方法调用
+     * @param apiClassName，接口对应的ClassName，用于后面通过反射进行方法调用
      */
-    public void register(String apiKey, Class apiClass){
+    public void register(String apiKey, String apiClassName){
         if (apiMap == null){
             apiMap = new HashMap<>();
         }
-        apiMap.put(apiKey, apiClass);
+        apiMap.put(apiKey, apiClassName);
     }
 
     /**
      * 批量注册Native端接口
      * @param map
      */
-    public void register(Map<String, Class> map){
+    public void register(Map<String, String> map){
         if (apiMap == null){
             apiMap = new HashMap<>();
         }
@@ -133,7 +136,7 @@ public final class ExtendJSCallManager {
      * 批量注销Native端接口
      * @param map
      */
-    public void unRegister(Map<String, Class> map){
+    public void unRegister(Map<String, String> map){
         if (apiMap != null){
             //遍历Map并删除
             for (String key : map.keySet()){
@@ -187,8 +190,28 @@ public final class ExtendJSCallManager {
      * @throws ExtendException
      */
     public AbstractJSCall newJSCall(String apiKey) throws ExtendException{
-        //通过apiKey找到对象的实例对象
-        Class clazz = apiMap.get(apiKey);
+        //通过apiKey找到对象的ClassName
+        String className = apiMap.get(apiKey);
+        if (className == null){
+            //抛出接口不存在异常
+            throw new ExtendException(ExtendException.CODE_NATIVE_API_NOT_FOUND, ExtendException.MSG_NATIVE_API_NOT_FOUND);
+        }
+        //接着从缓存中取该Class
+        Class clazz = apiMapClass.get(apiKey);
+        if (clazz == null){
+            //缓存为空，则加载该类
+            try {
+                clazz = Class.forName(className);
+                //放入缓存中
+                apiMapClass.put(apiKey, clazz);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                log(LogLevel.ERROR, TAG, e.getMessage());
+                //抛出接口不存在异常
+                throw new ExtendException(ExtendException.CODE_NATIVE_API_NOT_FOUND, ExtendException.MSG_NATIVE_API_NOT_FOUND);
+            }
+        }
+        //实例化对象并进行处理
         if (clazz != null && clazz.getSuperclass().equals(AbstractJSCall.class)){
             //通过类实例化该对象
             try {
@@ -204,8 +227,7 @@ public final class ExtendJSCallManager {
                 throw new ExtendException(ExtendException.CODE_INTERNAL_EXCEPTION, ExtendException.MSG_INTERNAL_EXCEPTION);
             }
         }else{
-            //抛出接口不存在异常
-            throw new ExtendException(ExtendException.CODE_NATIVE_API_NOT_FOUND, ExtendException.MSG_NATIVE_API_NOT_FOUND);
+            throw new ExtendException(ExtendException.CODE_INTERNAL_EXCEPTION, ExtendException.MSG_INTERNAL_EXCEPTION);
         }
     }
 

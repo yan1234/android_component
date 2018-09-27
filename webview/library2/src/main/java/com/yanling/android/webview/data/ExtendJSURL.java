@@ -59,6 +59,24 @@ public class ExtendJSURL {
     }
 
     /**
+     * 封装Native端返回JS端结果数据{"status": true, "result": xxx}
+     * @param result 返回实际结果值
+     * @param status 结果状态，true: 执行成功，false: 执行失败
+     * @return
+     */
+    public static String packageResult(String result, boolean status){
+        JSONObject json = new JSONObject();
+        try {
+            //封装状态和结果
+            json.put("status", status);
+            json.put("result", result);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return json.toString();
+    }
+
+    /**
      * 校验是否是JS Call协议
      * @param url，待校验的url信息
      * @return

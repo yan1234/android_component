@@ -18,7 +18,7 @@ var callbacks = window.callbacks;
 //常量定义 end
 
 /**
- * 封装自定义url通信协议数据 （"apiKey?{'action': '', 'data': '', 'callback':'', 'isAsync': true}"）
+ * 封装自定义url通信协议数据 （"jscall://apiKey?{'action': '', 'data': '', 'callback':'', 'isAsync': true}"）
  * @param apiKey 对应的Native接口唯一key值，由Native注册时提供
  * @param action 指定接口的操作类型参数
  * @param data 传递数据
@@ -33,7 +33,7 @@ function packageApiData(apiKey, action, data, callback, isAsync){
         "callback": callback,
         "isAsync": isAsync
     };
-    return apiKey + "?" + JSON.stringify(jsonObj);
+    return "jscall://" + apiKey + "?" + JSON.stringify(jsonObj);
 }
 
 /**
@@ -70,6 +70,7 @@ var extendJSCall = function(){
 
     /**
      * 同步请求Native，注意如果使用INTERCEPT_URL模式，则不会有返回值
+     * 返回数据类型{"status": true/false, "result": xxx}状态为调用成功与否，result为结果
      * @param apiKey 对应的Native接口唯一key值，由Native注册时提供
      * @param action 指定接口的操作类型参数
      * @param data 传递数据
@@ -78,6 +79,7 @@ var extendJSCall = function(){
     extendJSCall.execute = function(apiKey, action, data){
         //同步调用
         var result = jsCall(this.jsToNativeMode, packageApiData(apiKey, action, data, "", false));
+        //返回结果
         return result;
     }
 
@@ -100,6 +102,16 @@ var extendJSCall = function(){
         //异步调用
         var result = jsCall(this.jsToNativeMode, packageApiData(apiKey, action, data, callbackId, true));
         //对结果进行回调处理
+        //这里通过const_jsToNativeMode.INTERCEPT_UR方式请求的没有返回值
+        if (this.jsToNativeMode == const_jsToNativeMode.JS_OBJECT
+            || this.jsToNativeMode == const_jsToNativeMode.INTERCEPT_PROMPT){
+            //解析内部结果并返回
+            var json = JSON.parse(result);
+            //这里异步基本不会走成功，主要是用来返回异常信息的
+            if (json.status === false){
+                error(json.result);
+            }
+        }
     }
 
     return extendJSCall;
