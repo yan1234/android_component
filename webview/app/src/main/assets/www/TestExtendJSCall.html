@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>TestExtendJSCall</title>
+	<script type="text/javascript" src="ExtendJSCall.js"></script>
+	<script type="text/javascript">
+		window.onload = function(){
+			console.log(">>>>>>>初始化库");
+			//初始化JS库
+			extendJSCall.init(3);
+			console.log(">>>>>>>初始化库结束");
+		}
+		
+
+		function btnClick(){
+			var text = document.getElementById("text");
+			console.log(text.value);
+
+			var result = extendJSCall.execute("aaa", "0", text.value);
+			console.log(result);
+		}
+
+		function btnClickAsync(){
+			var text = document.getElementById("text");
+			console.log(text.value);
+
+			extendJSCall.enqueue("aaa", "0", text.value,
+				function(success){
+					console.log(success);
+				}, function(error){
+					console.log(error);
+				});
+		}
+
+	</script>
+</head>
+<body>
+<input type="text" id="text" />
+<input type="button" id = "btn" value="button" onclick="return btnClickAsync();" />
+</body>
+</html>
