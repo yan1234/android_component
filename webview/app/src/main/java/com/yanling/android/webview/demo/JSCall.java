@@ -25,7 +25,7 @@ public class JSCall extends AbstractJSCall {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                success("success");
+                success("success", false);
             }
         }).start();
     }

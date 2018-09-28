@@ -30,8 +30,8 @@ public class MainActivity extends Activity {
         //测试
         try {
             //testJSObj();
-            //testJSUrl();
-            testJSPrompt();
+            testJSUrl();
+            //testJSPrompt();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
                 .init(ExtendJSCallManager.MODE_JS_OBJECT)
                 .injectWebView(webView);
         //注册H5端API
-        ExtendJSCallManager.getInstance().register("aaa", "com.yanling.android.webview.demo.JSObj");
+        ExtendJSCallManager.getInstance().register("aaa", "com.yanling.android.webview.demo.JSCall");
 
     }
 

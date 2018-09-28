@@ -7,7 +7,7 @@
 		window.onload = function(){
 			console.log(">>>>>>>初始化库");
 			//初始化JS库
-			extendJSCall.init(3);
+			extendJSCall.init(extendJSCall.const_jsToNativeMode.INTERCEPT_URL);
 			console.log(">>>>>>>初始化库结束");
 		}
 		
@@ -27,8 +27,10 @@
 			extendJSCall.enqueue("aaa", "0", text.value,
 				function(success){
 					console.log(success);
+					text.value = success;
 				}, function(error){
 					console.log(error);
+					text.value = error;
 				});
 		}
 
