@@ -29,9 +29,9 @@ public final class ExtendJSCallManager {
     public static final String MODE_INTERCEPT_PROMPT = "MODE_INTERCEPT_PROMPT";
 
     //定义JS端Callbacks回调对象名字空间,成功回调和失败回调方法
-    private static final String JS_CALLBACK_NAME = "callbacks";
-    private static final String JS_CALLBACK_SUCCESS = "success";
-    private static final String JS_CALLBACK_ERROR = "error";
+    private static final String JS_CALLBACK_NAME = "extendJSCallbacks";
+    private static final String JS_CALLBACK_SUCCESS = "callbackSuccess";
+    private static final String JS_CALLBACK_ERROR = "callbackError";
 
     //定义JSApi管理器对象
     private static ExtendJSCallManager mInstance;
@@ -159,14 +159,15 @@ public final class ExtendJSCallManager {
      * @param callback JS端回调的callback接口
      * @param result 返回结果（成功或失败数据）
      * @param status true: 返回成功；false:返回失败
+     * @param isKeep "true": 保持住异步时保持住callback回调；"false"：调用结束即销毁JS 端Callback回调对象
      */
-    public void jsCallback(final String callback, final String result, final boolean status){
+    public void jsCallback(final String callback, final String result, final boolean status, final String isKeep){
         runOnUIThread(new Runnable() {
             @Override
             public void run() {
                 //根据状态回调指定的方法（success/error）
                 String tmp = status ? JS_CALLBACK_SUCCESS : JS_CALLBACK_ERROR;
-                executeJS(webView, JS_CALLBACK_NAME + "." + callback + "." + tmp, null, result);
+                executeJS(webView, JS_CALLBACK_NAME + "." + callback + "." + tmp, null, result, isKeep);
             }
         });
     }

@@ -49,11 +49,12 @@ public abstract class AbstractJSCall {
     }
 
     /**
-     * 异步执行时返回成功回调
-     * @param result
+     * 异步执行是返回成功回调，无特殊场景，isKeep设置为false便于JS对无用回调的回收，节省内存空间
+     * @param result 返回结果
+     * @param isKeep true: 表示持续向js端回调，一般用于多个回调结果（进度返回等场景）；false: 只需要回调一次，然后JS端执行后就销毁回调对象，便于内存释放
      */
-    public final void success(String result){
-        ExtendJSCallManager.getInstance().jsCallback(callback, result, true);
+    public final void success(String result, boolean isKeep){
+        ExtendJSCallManager.getInstance().jsCallback(callback, result, true, isKeep ? "true" : "false");
     }
 
     /**
@@ -61,7 +62,7 @@ public abstract class AbstractJSCall {
      * @param errMsg
      */
     public final void error(String errMsg){
-        ExtendJSCallManager.getInstance().jsCallback(callback, errMsg, false);
+        ExtendJSCallManager.getInstance().jsCallback(callback, errMsg, false, "false");
     }
 
 }

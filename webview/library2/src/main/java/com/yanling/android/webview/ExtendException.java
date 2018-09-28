@@ -18,7 +18,10 @@ public class ExtendException extends Exception{
     public static final String MSG_INTERNAL_EXCEPTION = "Internal Exception";
     //数据协议格式错误异常
     public static final String CODE_URL_DATA_WRONG = "-3";
-    public static final String MSG_URL_DATA_WRONG = "Url Data Is Wrong";
+    public static final String MSG_URL_DATA_WRONG = "URL Data Is Wrong";
+    //协议格式编码类型不支持
+    public static final String CODE_URL_CHARSET_NOT_SUPPORT = "-4";
+    public static final String MSG_URL_CHARSET_NOT_SUPPORT = "URL Charset Is Not Support";
 
 
     //定义错误编码

@@ -7,6 +7,10 @@ import com.yanling.android.webview.ExtendJSCallManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
+
 /**
  * 自定义扩展的JSCall URL数据协议
  * 协议格式
@@ -20,16 +24,26 @@ public class ExtendJSURL {
 
     //定义URL协议的前缀
     private static final String PREFIX_STRING = "jscall://";
+    //定义URL协议的编码
+    private static final String CHARSET = "UTF-8";
 
 
     /**
      * 解析url 数据
-     * @param url js端传递的url数据
+     * @param sourceUrl js端传递的url数据
      * @param entity 将解析的数据封装在entity中
      * @return 返回apiKey
      * @throws ExtendException
      */
-    public static String parseURL(String url, JSCallEntity entity) throws ExtendException{
+    public static String parseURL(String sourceUrl, JSCallEntity entity) throws ExtendException{
+        //首先对url进行解码
+        String url = null;
+        try {
+            url = URLDecoder.decode(sourceUrl, CHARSET);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            throw new ExtendException(ExtendException.CODE_URL_CHARSET_NOT_SUPPORT, ExtendException.MSG_URL_CHARSET_NOT_SUPPORT);
+        }
         //1、校验url数据的合法性
         if (!isJSCallURL(url)){
             throw new ExtendException(ExtendException.CODE_URL_DATA_WRONG, ExtendException.MSG_URL_DATA_WRONG);
