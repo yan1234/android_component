@@ -62,12 +62,12 @@ android {
 //添加单元测试依赖
 dependencies {
     //单元测试
-    testCompile 'junit:junit:4.12'
-    androidTestCompile 'com.android.support.test:runner:0.4'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:0.4'
     // Set this dependency to use JUnit 4 rules
-    androidTestCompile 'com.android.support.test:rules:0.4'
+    androidTestImplementation 'com.android.support.test:rules:0.4'
     // Set this dependency to build and run Espresso tests
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.1'
     // Set this dependency to build and run UI Automator tests
     //androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
 }
@@ -75,7 +75,7 @@ dependencies {
 //添加maven上传的task
 uploadArchives {
     repositories.mavenDeployer {
-        def deployPath = file("E:\\Work\\Projects\\my\\maven-repo")
+        def deployPath = file("D:\\Work\\Projects\\my\\maven-repo")
         repository(url: "file://${deployPath.absolutePath}")
         pom.project {
             groupId module_publish_group_id

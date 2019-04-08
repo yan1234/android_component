@@ -1,0 +1,5 @@
+apply from:'../../common_android_library_3.gradle'
+
+dependencies {
+    implementation 'com.android.support:support-v4:25.3.0'
+}
